@@ -45,7 +45,6 @@
     --accent: #e89340;
     --accent-strong: #f2a55a;
     --accent-contrast: #17110a;
-    --danger: #e0655f;
 
     --radius: 6px;
     --radius-lg: 10px;
@@ -57,7 +56,7 @@
     --font-mono: ui-monospace, "SF Mono", menlo, consolas, monospace;
 
     /* Shared by the headings row and every parameter row so they stay aligned. */
-    --parameter-columns: minmax(9rem, 1fr) 6rem 5.5rem 5rem 5rem 4rem 5.5rem;
+    --parameter-columns: minmax(9rem, 1fr) 6rem 5.5rem 5rem 5rem 4rem;
   }
 }
 
@@ -210,7 +209,7 @@
     }
   }
 
-  #editor-status {
+  #device-status {
     flex-basis: 100%;
     font-size: 0.85rem;
     color: var(--text-faint);
@@ -271,23 +270,6 @@
     .parameter-enabled {
       justify-self: center;
     }
-
-    .parameter-remove {
-      font-size: 0.75rem;
-      color: var(--text-faint);
-      background: none;
-      border-color: transparent;
-
-      &:hover {
-        color: var(--danger);
-        background: none;
-        border-color: color-mix(in srgb, var(--danger) 45%, transparent);
-      }
-    }
-  }
-
-  #add-parameter {
-    margin-top: 0.9rem;
   }
 
   #randomise {

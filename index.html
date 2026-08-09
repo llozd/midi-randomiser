@@ -58,7 +58,7 @@
           <option value="">No devices available</option>
         </select>
 
-        <button id="new-device" type="button">New device</button>
+        <p id="device-status"></p>
       </section>
 
       <section>
@@ -71,7 +71,6 @@
           <span>Min</span>
           <span>Max</span>
           <span>Enabled</span>
-          <span></span>
         </div>
 
         <ul id="parameter-rows"></ul>
@@ -109,24 +108,10 @@
               data-field="enabled"
               type="checkbox"
             />
-            <button class="parameter-remove" type="button">Remove</button>
           </li>
         </template>
 
-        <button id="add-parameter" type="button">Add parameter</button>
         <button id="randomise" type="button">Randomise</button>
-      </section>
-
-      <section>
-        <h2>Edit device</h2>
-
-        <label for="device-name">Name</label>
-        <input id="device-name" type="text" />
-
-        <label for="device-manufacturer">Manufacturer</label>
-        <input id="device-manufacturer" type="text" />
-
-        <p id="editor-status"></p>
       </section>
     </main>
 
