@@ -1,4 +1,4 @@
-import { loadShippedDevices } from "./devices.js";
+import { loadDevice, loadDeviceIndex } from "./devices.js";
 import {
   getOutputs,
   isSupported,
@@ -16,6 +16,7 @@ const outputSelect = document.querySelector("#midi-output");
 const channelSelect = document.querySelector("#midi-channel");
 const refreshButton = document.querySelector("#refresh-ports");
 const statusLine = document.querySelector("#midi-status");
+const manufacturerSelect = document.querySelector("#manufacturer-select");
 const deviceSelect = document.querySelector("#device-select");
 const randomiseButton = document.querySelector("#randomise");
 const deviceStatus = document.querySelector("#device-status");
@@ -23,8 +24,12 @@ const deviceStatus = document.querySelector("#device-status");
 const NUMERIC_FIELDS = new Set(["number", "min", "max"]);
 
 let connected = false;
-let devices = [];
+// Manifest entries: { file, name, manufacturer }. The device itself is only
+// fetched on selection.
+let index = [];
 let currentDevice = null;
+// Bumped on every selection, so a slow fetch can't overwrite a newer one.
+let selectionToken = 0;
 
 function setStatus(message) {
   statusLine.textContent = message;
@@ -91,35 +96,104 @@ async function connect() {
   renderOutputs();
 }
 
-const deviceLabel = (device) =>
-  [device.manufacturer, device.name].filter(Boolean).join(" ") || "Untitled";
+const deviceLabel = (entry) =>
+  [entry.manufacturer, entry.name].filter(Boolean).join(" ") || "Untitled";
 
-function renderDeviceOptions() {
-  if (devices.length === 0) {
-    deviceSelect.replaceChildren(placeholderOption("No devices available"));
+const modelsOf = (manufacturer) =>
+  index.filter((entry) => entry.manufacturer === manufacturer);
+
+function renderManufacturerOptions() {
+  if (index.length === 0) {
+    manufacturerSelect.replaceChildren(
+      placeholderOption("No devices available"),
+    );
     return;
   }
 
-  deviceSelect.replaceChildren(
-    ...devices.map((device, index) => {
+  // The manifest already arrives sorted by manufacturer, so first-seen order
+  // is alphabetical.
+  const manufacturers = [...new Set(index.map((entry) => entry.manufacturer))];
+
+  manufacturerSelect.replaceChildren(
+    ...manufacturers.map((manufacturer) => {
       const option = document.createElement("option");
-      option.value = String(index);
-      option.textContent = deviceLabel(device);
+      option.value = manufacturer;
+      option.textContent = manufacturer;
       return option;
     }),
   );
 }
 
-function selectDevice(index) {
-  const device = devices[index];
+/** Fills the model select with one manufacturer's devices. */
+function renderModelOptions(manufacturer) {
+  const models = modelsOf(manufacturer);
 
-  if (!device) {
+  if (models.length === 0) {
+    deviceSelect.replaceChildren(placeholderOption("No devices available"));
+    return;
+  }
+
+  deviceSelect.replaceChildren(
+    ...models.map((entry) => {
+      const option = document.createElement("option");
+      // Keyed by filename rather than position, so the value survives the
+      // list being rebuilt.
+      option.value = entry.file;
+      option.textContent = entry.name;
+      return option;
+    }),
+  );
+}
+
+/** Switches manufacturer and selects its first model. */
+function selectManufacturer(manufacturer) {
+  const [first] = modelsOf(manufacturer);
+
+  if (!first) {
+    return;
+  }
+
+  manufacturerSelect.value = manufacturer;
+  renderModelOptions(manufacturer);
+  return selectDevice(first.file);
+}
+
+async function selectDevice(file) {
+  const entry = index.find((item) => item.file === file);
+
+  if (!entry) {
+    return;
+  }
+
+  // Keeps the dropdowns in step when the selection is made in code.
+  deviceSelect.value = file;
+
+  const token = ++selectionToken;
+  currentDevice = null;
+  renderParameters([]);
+  setDeviceStatus(`Loading ${deviceLabel(entry)}...`);
+
+  let device;
+
+  try {
+    device = await loadDevice(file);
+  } catch (error) {
+    console.error(error);
+
+    if (token === selectionToken) {
+      setDeviceStatus(`Could not load ${deviceLabel(entry)}.`);
+    }
+
+    return;
+  }
+
+  // A newer selection landed while this one was in flight.
+  if (token !== selectionToken) {
     return;
   }
 
   currentDevice = device;
-  // Keeps the dropdown in step when the selection is made in code.
-  deviceSelect.value = String(index);
+  setDeviceStatus("");
   renderParameters(device.parameters);
 }
 
@@ -153,19 +227,17 @@ function randomise() {
 
 async function loadDevices() {
   try {
-    devices = await loadShippedDevices();
+    index = await loadDeviceIndex();
   } catch (error) {
-    setDeviceStatus("Could not load devices.");
+    setDeviceStatus("Could not load the device list.");
     console.error(error);
   }
 
-  if (devices.length === 0) {
-    renderDeviceOptions();
-    return;
-  }
+  renderManufacturerOptions();
 
-  renderDeviceOptions();
-  selectDevice(0);
+  if (index.length > 0) {
+    await selectManufacturer(index[0].manufacturer);
+  }
 }
 
 refreshButton.addEventListener("click", () => {
@@ -176,8 +248,12 @@ refreshButton.addEventListener("click", () => {
   }
 });
 
+manufacturerSelect.addEventListener("change", () => {
+  selectManufacturer(manufacturerSelect.value);
+});
+
 deviceSelect.addEventListener("change", () => {
-  selectDevice(Number(deviceSelect.value));
+  selectDevice(deviceSelect.value);
 });
 
 outputSelect.addEventListener("change", () => {

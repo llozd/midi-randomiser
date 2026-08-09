@@ -32,8 +32,14 @@ const device = (parameters) => ({
   parameters,
 });
 
+const entryFor = (file, device) => ({
+  file,
+  name: device.name,
+  manufacturer: device.manufacturer,
+});
+
 /** Temp repo with the real schema, the given device files, and a manifest. */
-async function fixture(devices, manifest = Object.keys(devices)) {
+async function fixture(devices, manifest) {
   const dir = await mkdtemp(join(tmpdir(), "midi-randomiser-validate-"));
   await mkdir(join(dir, "devices"));
   await copyFile(SCHEMA, join(dir, "devices", "schema.json"));
@@ -42,7 +48,11 @@ async function fixture(devices, manifest = Object.keys(devices)) {
     await writeFile(join(dir, "devices", name), JSON.stringify(contents));
   }
 
-  await writeFile(join(dir, "devices", "index.json"), JSON.stringify(manifest));
+  const entries =
+    manifest ??
+    Object.entries(devices).map(([file, device]) => entryFor(file, device));
+
+  await writeFile(join(dir, "devices", "index.json"), JSON.stringify(entries));
   return dir;
 }
 
@@ -71,7 +81,9 @@ test("a cc number above 127 fails", async () => {
 
 test("an nrpn number above 127 is allowed", async () => {
   const dir = await fixture({
-    "test.json": device([parameter({ type: "nrpn", number: 1024, max: 16383 })]),
+    "test.json": device([
+      parameter({ type: "nrpn", number: 1024, max: 16383 }),
+    ]),
   });
 
   assert.equal(await validate(dir), null);
@@ -100,7 +112,20 @@ test("a device file missing from the manifest fails", async () => {
 });
 
 test("a manifest entry with no file fails", async () => {
-  const dir = await fixture({}, ["gone.json"]);
+  const dir = await fixture({}, [
+    { file: "gone.json", name: "Gone", manufacturer: "Acme" },
+  ]);
 
   assert.match(await validate(dir), /lists gone\.json, which does not exist/);
+});
+
+test("a manifest whose name is out of date fails", async () => {
+  const dir = await fixture({ "test.json": device([parameter()]) }, [
+    { file: "test.json", name: "Stale", manufacturer: "Acme" },
+  ]);
+
+  assert.match(
+    await validate(dir),
+    /index\.json name\/manufacturer is out of date/,
+  );
 });

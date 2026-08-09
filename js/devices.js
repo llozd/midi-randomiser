@@ -1,6 +1,7 @@
 /**
- * Loads the devices shipped in the repo. Static hosts can't list a directory,
- * so the files are discovered through the devices/index.json manifest.
+ * Static hosts can't list a directory, so devices are discovered through the
+ * devices/index.json manifest. It carries enough to build the picker, and a
+ * device file is only fetched once that device is selected.
  */
 
 const DEVICES_PATH = "devices/";
@@ -15,7 +16,11 @@ async function fetchJson(path) {
   return response.json();
 }
 
-export async function loadShippedDevices() {
-  const manifest = await fetchJson(`${DEVICES_PATH}index.json`);
-  return Promise.all(manifest.map((file) => fetchJson(DEVICES_PATH + file)));
+/** Resolves to [{ file, name, manufacturer }]. */
+export function loadDeviceIndex() {
+  return fetchJson(`${DEVICES_PATH}index.json`);
+}
+
+export function loadDevice(file) {
+  return fetchJson(DEVICES_PATH + file);
 }
