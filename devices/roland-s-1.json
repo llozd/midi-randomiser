@@ -52,7 +52,7 @@
       "enabled": true
     },
     {
-      "name": "Oscillator LFO",
+      "name": "Oscillator LFO pitch",
       "type": "cc",
       "number": 13,
       "min": 0,
@@ -68,7 +68,7 @@
       "enabled": false
     },
     {
-      "name": "Oscillator pulse width",
+      "name": "Oscillator square pulse width",
       "type": "cc",
       "number": 15,
       "min": 0,
@@ -140,7 +140,7 @@
       "enabled": true
     },
     {
-      "name": "Filter envelope",
+      "name": "Filter envelope depth",
       "type": "cc",
       "number": 24,
       "min": 0,
@@ -148,7 +148,7 @@
       "enabled": true
     },
     {
-      "name": "Filter LFO",
+      "name": "Filter LFO depth",
       "type": "cc",
       "number": 25,
       "min": 0,
@@ -380,7 +380,7 @@
       "enabled": false
     },
     {
-      "name": "Chorus",
+      "name": "Chorus type",
       "type": "cc",
       "number": 93,
       "min": 0,
