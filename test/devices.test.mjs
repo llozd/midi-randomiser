@@ -1,9 +1,14 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { loadShippedDevices } from "../js/devices.js";
+import { loadDevice, loadDeviceIndex } from "../js/devices.js";
 
 const volcaFm = { name: "Volca FM", manufacturer: "Korg", parameters: [] };
+const entry = {
+  file: "korg-volca-fm.json",
+  name: "Volca FM",
+  manufacturer: "Korg",
+};
 
 /** Serves the given path -> body map, 404s anything else. */
 function stubFetch(bodies) {
@@ -22,40 +27,36 @@ function stubFetch(bodies) {
   return requested;
 }
 
-test("devices are loaded from the paths listed in the manifest", async () => {
-  const requested = stubFetch({
-    "devices/index.json": ["korg-volca-fm.json"],
-    "devices/korg-volca-fm.json": volcaFm,
-  });
+test("the index is read from the manifest alone", async () => {
+  const requested = stubFetch({ "devices/index.json": [entry] });
 
-  const devices = await loadShippedDevices();
-
-  assert.deepEqual(devices, [volcaFm]);
-  assert.deepEqual(requested, [
-    "devices/index.json",
-    "devices/korg-volca-fm.json",
-  ]);
+  assert.deepEqual(await loadDeviceIndex(), [entry]);
+  assert.deepEqual(requested, ["devices/index.json"]);
 });
 
-test("an empty manifest loads nothing", async () => {
+test("an empty manifest gives an empty index", async () => {
   stubFetch({ "devices/index.json": [] });
-  assert.deepEqual(await loadShippedDevices(), []);
+  assert.deepEqual(await loadDeviceIndex(), []);
 });
 
 test("a missing manifest rejects", async () => {
   stubFetch({});
 
-  await assert.rejects(
-    loadShippedDevices(),
-    /devices\/index\.json returned 404/,
-  );
+  await assert.rejects(loadDeviceIndex(), /devices\/index\.json returned 404/);
 });
 
-test("a device listed but missing rejects", async () => {
-  stubFetch({ "devices/index.json": ["gone.json"] });
+test("a device is fetched by filename", async () => {
+  const requested = stubFetch({ "devices/korg-volca-fm.json": volcaFm });
+
+  assert.deepEqual(await loadDevice("korg-volca-fm.json"), volcaFm);
+  assert.deepEqual(requested, ["devices/korg-volca-fm.json"]);
+});
+
+test("a missing device rejects", async () => {
+  stubFetch({});
 
   await assert.rejects(
-    loadShippedDevices(),
+    loadDevice("gone.json"),
     /devices\/gone\.json returned 404/,
   );
 });

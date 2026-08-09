@@ -1,4 +1,4 @@
-import { loadShippedDevices } from "./devices.js";
+import { loadDevice, loadDeviceIndex } from "./devices.js";
 import {
   getOutputs,
   isSupported,
@@ -23,8 +23,12 @@ const deviceStatus = document.querySelector("#device-status");
 const NUMERIC_FIELDS = new Set(["number", "min", "max"]);
 
 let connected = false;
-let devices = [];
+// Manifest entries: { file, name, manufacturer }. The device itself is only
+// fetched on selection.
+let index = [];
 let currentDevice = null;
+// Bumped on every selection, so a slow fetch can't overwrite a newer one.
+let selectionToken = 0;
 
 function setStatus(message) {
   statusLine.textContent = message;
@@ -91,35 +95,63 @@ async function connect() {
   renderOutputs();
 }
 
-const deviceLabel = (device) =>
-  [device.manufacturer, device.name].filter(Boolean).join(" ") || "Untitled";
+const deviceLabel = (entry) =>
+  [entry.manufacturer, entry.name].filter(Boolean).join(" ") || "Untitled";
 
 function renderDeviceOptions() {
-  if (devices.length === 0) {
+  if (index.length === 0) {
     deviceSelect.replaceChildren(placeholderOption("No devices available"));
     return;
   }
 
   deviceSelect.replaceChildren(
-    ...devices.map((device, index) => {
+    ...index.map((entry) => {
       const option = document.createElement("option");
-      option.value = String(index);
-      option.textContent = deviceLabel(device);
+      // Keyed by filename rather than position, so the value survives the
+      // list being rebuilt.
+      option.value = entry.file;
+      option.textContent = deviceLabel(entry);
       return option;
     }),
   );
 }
 
-function selectDevice(index) {
-  const device = devices[index];
+async function selectDevice(file) {
+  const entry = index.find((item) => item.file === file);
 
-  if (!device) {
+  if (!entry) {
+    return;
+  }
+
+  // Keeps the dropdown in step when the selection is made in code.
+  deviceSelect.value = file;
+
+  const token = ++selectionToken;
+  currentDevice = null;
+  renderParameters([]);
+  setDeviceStatus(`Loading ${deviceLabel(entry)}...`);
+
+  let device;
+
+  try {
+    device = await loadDevice(file);
+  } catch (error) {
+    console.error(error);
+
+    if (token === selectionToken) {
+      setDeviceStatus(`Could not load ${deviceLabel(entry)}.`);
+    }
+
+    return;
+  }
+
+  // A newer selection landed while this one was in flight.
+  if (token !== selectionToken) {
     return;
   }
 
   currentDevice = device;
-  // Keeps the dropdown in step when the selection is made in code.
-  deviceSelect.value = String(index);
+  setDeviceStatus("");
   renderParameters(device.parameters);
 }
 
@@ -153,19 +185,17 @@ function randomise() {
 
 async function loadDevices() {
   try {
-    devices = await loadShippedDevices();
+    index = await loadDeviceIndex();
   } catch (error) {
-    setDeviceStatus("Could not load devices.");
+    setDeviceStatus("Could not load the device list.");
     console.error(error);
   }
 
-  if (devices.length === 0) {
-    renderDeviceOptions();
-    return;
-  }
-
   renderDeviceOptions();
-  selectDevice(0);
+
+  if (index.length > 0) {
+    await selectDevice(index[0].file);
+  }
 }
 
 refreshButton.addEventListener("click", () => {
@@ -177,7 +207,7 @@ refreshButton.addEventListener("click", () => {
 });
 
 deviceSelect.addEventListener("change", () => {
-  selectDevice(Number(deviceSelect.value));
+  selectDevice(deviceSelect.value);
 });
 
 outputSelect.addEventListener("change", () => {
