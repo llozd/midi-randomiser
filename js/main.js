@@ -16,6 +16,7 @@ const outputSelect = document.querySelector("#midi-output");
 const channelSelect = document.querySelector("#midi-channel");
 const refreshButton = document.querySelector("#refresh-ports");
 const statusLine = document.querySelector("#midi-status");
+const manufacturerSelect = document.querySelector("#manufacturer-select");
 const deviceSelect = document.querySelector("#device-select");
 const randomiseButton = document.querySelector("#randomise");
 const deviceStatus = document.querySelector("#device-status");
@@ -98,22 +99,63 @@ async function connect() {
 const deviceLabel = (entry) =>
   [entry.manufacturer, entry.name].filter(Boolean).join(" ") || "Untitled";
 
-function renderDeviceOptions() {
+const modelsOf = (manufacturer) =>
+  index.filter((entry) => entry.manufacturer === manufacturer);
+
+function renderManufacturerOptions() {
   if (index.length === 0) {
+    manufacturerSelect.replaceChildren(
+      placeholderOption("No devices available"),
+    );
+    return;
+  }
+
+  // The manifest already arrives sorted by manufacturer, so first-seen order
+  // is alphabetical.
+  const manufacturers = [...new Set(index.map((entry) => entry.manufacturer))];
+
+  manufacturerSelect.replaceChildren(
+    ...manufacturers.map((manufacturer) => {
+      const option = document.createElement("option");
+      option.value = manufacturer;
+      option.textContent = manufacturer;
+      return option;
+    }),
+  );
+}
+
+/** Fills the model select with one manufacturer's devices. */
+function renderModelOptions(manufacturer) {
+  const models = modelsOf(manufacturer);
+
+  if (models.length === 0) {
     deviceSelect.replaceChildren(placeholderOption("No devices available"));
     return;
   }
 
   deviceSelect.replaceChildren(
-    ...index.map((entry) => {
+    ...models.map((entry) => {
       const option = document.createElement("option");
       // Keyed by filename rather than position, so the value survives the
       // list being rebuilt.
       option.value = entry.file;
-      option.textContent = deviceLabel(entry);
+      option.textContent = entry.name;
       return option;
     }),
   );
+}
+
+/** Switches manufacturer and selects its first model. */
+function selectManufacturer(manufacturer) {
+  const [first] = modelsOf(manufacturer);
+
+  if (!first) {
+    return;
+  }
+
+  manufacturerSelect.value = manufacturer;
+  renderModelOptions(manufacturer);
+  return selectDevice(first.file);
 }
 
 async function selectDevice(file) {
@@ -123,7 +165,7 @@ async function selectDevice(file) {
     return;
   }
 
-  // Keeps the dropdown in step when the selection is made in code.
+  // Keeps the dropdowns in step when the selection is made in code.
   deviceSelect.value = file;
 
   const token = ++selectionToken;
@@ -191,10 +233,10 @@ async function loadDevices() {
     console.error(error);
   }
 
-  renderDeviceOptions();
+  renderManufacturerOptions();
 
   if (index.length > 0) {
-    await selectDevice(index[0].file);
+    await selectManufacturer(index[0].manufacturer);
   }
 }
 
@@ -204,6 +246,10 @@ refreshButton.addEventListener("click", () => {
   } else {
     connect();
   }
+});
+
+manufacturerSelect.addEventListener("change", () => {
+  selectManufacturer(manufacturerSelect.value);
 });
 
 deviceSelect.addEventListener("change", () => {
