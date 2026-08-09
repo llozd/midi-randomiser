@@ -1,9 +1,7 @@
 /**
- * Loads the devices shipped in the repo. Static hosts can't list a directory,
- * so the files are discovered through the devices/index.json manifest.
- *
- * The manifest carries enough to build the picker, and a device file is only
- * fetched once that device is selected.
+ * Static hosts can't list a directory, so devices are discovered through the
+ * devices/index.json manifest. It carries enough to build the picker, and a
+ * device file is only fetched once that device is selected.
  */
 
 const DEVICES_PATH = "devices/";
