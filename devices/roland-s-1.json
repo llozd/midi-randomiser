@@ -1,0 +1,439 @@
+{
+  "name": "S-1",
+  "manufacturer": "Roland",
+  "schemaVersion": 1,
+  "parameters": [
+    {
+      "name": "Modulation wheel",
+      "type": "cc",
+      "number": 1,
+      "min": 0,
+      "max": 127,
+      "enabled": false
+    },
+    {
+      "name": "LFO rate",
+      "type": "cc",
+      "number": 3,
+      "min": 0,
+      "max": 127,
+      "enabled": true
+    },
+    {
+      "name": "Portamento time",
+      "type": "cc",
+      "number": 5,
+      "min": 0,
+      "max": 127,
+      "enabled": false
+    },
+    {
+      "name": "Pan",
+      "type": "cc",
+      "number": 10,
+      "min": 0,
+      "max": 127,
+      "enabled": false
+    },
+    {
+      "name": "Expression pedal",
+      "type": "cc",
+      "number": 11,
+      "min": 0,
+      "max": 127,
+      "enabled": false
+    },
+    {
+      "name": "LFO wave form",
+      "type": "cc",
+      "number": 12,
+      "min": 0,
+      "max": 127,
+      "enabled": true
+    },
+    {
+      "name": "Oscillator LFO",
+      "type": "cc",
+      "number": 13,
+      "min": 0,
+      "max": 127,
+      "enabled": true
+    },
+    {
+      "name": "Oscillator range",
+      "type": "cc",
+      "number": 14,
+      "min": 0,
+      "max": 127,
+      "enabled": false
+    },
+    {
+      "name": "Oscillator pulse width",
+      "type": "cc",
+      "number": 15,
+      "min": 0,
+      "max": 127,
+      "enabled": true
+    },
+    {
+      "name": "Oscillator PWM source",
+      "type": "cc",
+      "number": 16,
+      "min": 0,
+      "max": 127,
+      "enabled": false
+    },
+    {
+      "name": "LFO modulation depth",
+      "type": "cc",
+      "number": 17,
+      "min": 0,
+      "max": 127,
+      "enabled": true
+    },
+    {
+      "name": "Oscillator bend sens",
+      "type": "cc",
+      "number": 18,
+      "min": 0,
+      "max": 127,
+      "enabled": false
+    },
+    {
+      "name": "Square level",
+      "type": "cc",
+      "number": 19,
+      "min": 0,
+      "max": 127,
+      "enabled": true
+    },
+    {
+      "name": "Saw level",
+      "type": "cc",
+      "number": 20,
+      "min": 0,
+      "max": 127,
+      "enabled": true
+    },
+    {
+      "name": "Sub oscillator level",
+      "type": "cc",
+      "number": 21,
+      "min": 0,
+      "max": 127,
+      "enabled": true
+    },
+    {
+      "name": "Sub oscillator octave",
+      "type": "cc",
+      "number": 22,
+      "min": 0,
+      "max": 127,
+      "enabled": false
+    },
+    {
+      "name": "Noise level",
+      "type": "cc",
+      "number": 23,
+      "min": 0,
+      "max": 127,
+      "enabled": true
+    },
+    {
+      "name": "Filter envelope",
+      "type": "cc",
+      "number": 24,
+      "min": 0,
+      "max": 127,
+      "enabled": true
+    },
+    {
+      "name": "Filter LFO",
+      "type": "cc",
+      "number": 25,
+      "min": 0,
+      "max": 127,
+      "enabled": true
+    },
+    {
+      "name": "Filter keyboard follow",
+      "type": "cc",
+      "number": 26,
+      "min": 0,
+      "max": 127,
+      "enabled": false
+    },
+    {
+      "name": "Filter bend sens",
+      "type": "cc",
+      "number": 27,
+      "min": 0,
+      "max": 127,
+      "enabled": false
+    },
+    {
+      "name": "Amp envelope mode",
+      "type": "cc",
+      "number": 28,
+      "min": 0,
+      "max": 127,
+      "enabled": false
+    },
+    {
+      "name": "Envelope trigger mode",
+      "type": "cc",
+      "number": 29,
+      "min": 0,
+      "max": 127,
+      "enabled": false
+    },
+    {
+      "name": "Envelope sustain",
+      "type": "cc",
+      "number": 30,
+      "min": 0,
+      "max": 127,
+      "enabled": true
+    },
+    {
+      "name": "Portamento mode",
+      "type": "cc",
+      "number": 31,
+      "min": 0,
+      "max": 127,
+      "enabled": false
+    },
+    {
+      "name": "Damper pedal",
+      "type": "cc",
+      "number": 64,
+      "min": 0,
+      "max": 127,
+      "enabled": false
+    },
+    {
+      "name": "Portamento",
+      "type": "cc",
+      "number": 65,
+      "min": 0,
+      "max": 127,
+      "enabled": false
+    },
+    {
+      "name": "Filter resonance",
+      "type": "cc",
+      "number": 71,
+      "min": 0,
+      "max": 127,
+      "enabled": true
+    },
+    {
+      "name": "Envelope release",
+      "type": "cc",
+      "number": 72,
+      "min": 0,
+      "max": 127,
+      "enabled": true
+    },
+    {
+      "name": "Envelope attack",
+      "type": "cc",
+      "number": 73,
+      "min": 0,
+      "max": 127,
+      "enabled": true
+    },
+    {
+      "name": "Filter frequency",
+      "type": "cc",
+      "number": 74,
+      "min": 0,
+      "max": 127,
+      "enabled": true
+    },
+    {
+      "name": "Envelope decay",
+      "type": "cc",
+      "number": 75,
+      "min": 0,
+      "max": 127,
+      "enabled": true
+    },
+    {
+      "name": "Fine tune",
+      "type": "cc",
+      "number": 76,
+      "min": 0,
+      "max": 127,
+      "enabled": false
+    },
+    {
+      "name": "Transpose switch",
+      "type": "cc",
+      "number": 77,
+      "min": 0,
+      "max": 127,
+      "enabled": false
+    },
+    {
+      "name": "Noise mode",
+      "type": "cc",
+      "number": 78,
+      "min": 0,
+      "max": 127,
+      "enabled": false
+    },
+    {
+      "name": "LFO mode",
+      "type": "cc",
+      "number": 79,
+      "min": 0,
+      "max": 127,
+      "enabled": false
+    },
+    {
+      "name": "Poly mode",
+      "type": "cc",
+      "number": 80,
+      "min": 0,
+      "max": 127,
+      "enabled": false
+    },
+    {
+      "name": "Chord voice 2 switch",
+      "type": "cc",
+      "number": 81,
+      "min": 0,
+      "max": 127,
+      "enabled": false
+    },
+    {
+      "name": "Chord voice 3 switch",
+      "type": "cc",
+      "number": 82,
+      "min": 0,
+      "max": 127,
+      "enabled": false
+    },
+    {
+      "name": "Chord voice 4 switch",
+      "type": "cc",
+      "number": 83,
+      "min": 0,
+      "max": 127,
+      "enabled": false
+    },
+    {
+      "name": "Chord voice 2 key shift",
+      "type": "cc",
+      "number": 85,
+      "min": 0,
+      "max": 127,
+      "enabled": false
+    },
+    {
+      "name": "Chord voice 3 key shift",
+      "type": "cc",
+      "number": 86,
+      "min": 0,
+      "max": 127,
+      "enabled": false
+    },
+    {
+      "name": "Chord voice 4 key shift",
+      "type": "cc",
+      "number": 87,
+      "min": 0,
+      "max": 127,
+      "enabled": false
+    },
+    {
+      "name": "Reverb time",
+      "type": "cc",
+      "number": 89,
+      "min": 0,
+      "max": 127,
+      "enabled": false
+    },
+    {
+      "name": "Delay time",
+      "type": "cc",
+      "number": 90,
+      "min": 0,
+      "max": 127,
+      "enabled": false
+    },
+    {
+      "name": "Reverb level",
+      "type": "cc",
+      "number": 91,
+      "min": 0,
+      "max": 127,
+      "enabled": false
+    },
+    {
+      "name": "Delay level",
+      "type": "cc",
+      "number": 92,
+      "min": 0,
+      "max": 127,
+      "enabled": false
+    },
+    {
+      "name": "Chorus",
+      "type": "cc",
+      "number": 93,
+      "min": 0,
+      "max": 127,
+      "enabled": false
+    },
+    {
+      "name": "Oscillator draw multiply",
+      "type": "cc",
+      "number": 102,
+      "min": 0,
+      "max": 127,
+      "enabled": true
+    },
+    {
+      "name": "Oscillator chop overtone",
+      "type": "cc",
+      "number": 103,
+      "min": 0,
+      "max": 127,
+      "enabled": true
+    },
+    {
+      "name": "Oscillator chop comb",
+      "type": "cc",
+      "number": 104,
+      "min": 0,
+      "max": 127,
+      "enabled": true
+    },
+    {
+      "name": "LFO key trigger",
+      "type": "cc",
+      "number": 105,
+      "min": 0,
+      "max": 127,
+      "enabled": false
+    },
+    {
+      "name": "LFO sync",
+      "type": "cc",
+      "number": 106,
+      "min": 0,
+      "max": 127,
+      "enabled": false
+    },
+    {
+      "name": "Oscillator draw switch",
+      "type": "cc",
+      "number": 107,
+      "min": 0,
+      "max": 127,
+      "enabled": false
+    }
+  ]
+}
