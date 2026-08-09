@@ -175,31 +175,6 @@
     accent-color: var(--accent);
   }
 
-  input[type="file"] {
-    padding: 0;
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    background: none;
-    border: none;
-
-    &::file-selector-button {
-      height: var(--control-height);
-      margin-right: 0.6rem;
-      padding-inline: 0.75rem;
-      font-size: 0.85rem;
-      color: var(--text);
-      cursor: pointer;
-      background: var(--surface-raised);
-      border: 1px solid var(--border-strong);
-      border-radius: var(--radius);
-    }
-
-    &::file-selector-button:hover {
-      background: color-mix(in srgb, var(--surface-raised) 70%, white);
-      border-color: var(--text-faint);
-    }
-  }
-
   button {
     height: var(--control-height);
     padding-inline: 0.75rem;
