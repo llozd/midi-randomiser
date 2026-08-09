@@ -45,8 +45,14 @@ test("both bounds are reachable", () => {
 });
 
 test("a max at or below min collapses to min", () => {
-  assert.equal(randomiseParameters([parameter({ min: 5, max: 5 })])[0].value, 5);
-  assert.equal(randomiseParameters([parameter({ min: 9, max: 2 })])[0].value, 9);
+  assert.equal(
+    randomiseParameters([parameter({ min: 5, max: 5 })])[0].value,
+    5,
+  );
+  assert.equal(
+    randomiseParameters([parameter({ min: 9, max: 2 })])[0].value,
+    9,
+  );
 });
 
 test("no enabled parameters yields nothing", () => {

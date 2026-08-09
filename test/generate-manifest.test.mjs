@@ -12,12 +12,10 @@ const SCRIPT = fileURLToPath(
   new URL("../scripts/generate-manifest.mjs", import.meta.url),
 );
 
-const DEVICE = JSON.stringify({
-  name: "X",
-  manufacturer: "Y",
-  schemaVersion: 1,
-  parameters: [],
-});
+const device = (name, manufacturer) =>
+  JSON.stringify({ name, manufacturer, schemaVersion: 1, parameters: [] });
+
+const DEVICE = device("X", "Y");
 
 /** Builds a temp repo containing just a devices/ directory. */
 async function fixture(files) {
@@ -36,14 +34,28 @@ async function generate(dir) {
   return JSON.parse(await readFile(join(dir, "devices", "index.json"), "utf8"));
 }
 
-test("device files are listed in sorted order", async () => {
+test("entries are sorted by manufacturer, then by model", async () => {
   const dir = await fixture({
-    "zzz.json": DEVICE,
-    "aaa.json": DEVICE,
-    "mmm.json": DEVICE,
+    "c.json": device("Volca FM", "Korg"),
+    "a.json": device("S-1", "Roland"),
+    "b.json": device("Electribe", "Korg"),
   });
 
-  assert.deepEqual(await generate(dir), ["aaa.json", "mmm.json", "zzz.json"]);
+  assert.deepEqual(await generate(dir), [
+    { file: "b.json", name: "Electribe", manufacturer: "Korg" },
+    { file: "c.json", name: "Volca FM", manufacturer: "Korg" },
+    { file: "a.json", name: "S-1", manufacturer: "Roland" },
+  ]);
+});
+
+test("each entry carries the device name and manufacturer", async () => {
+  const dir = await fixture({
+    "korg-volca-fm.json": device("Volca FM", "Korg"),
+  });
+
+  assert.deepEqual(await generate(dir), [
+    { file: "korg-volca-fm.json", name: "Volca FM", manufacturer: "Korg" },
+  ]);
 });
 
 test("schema.json and an existing index.json are excluded", async () => {
@@ -53,7 +65,9 @@ test("schema.json and an existing index.json are excluded", async () => {
     "korg-volca-fm.json": DEVICE,
   });
 
-  assert.deepEqual(await generate(dir), ["korg-volca-fm.json"]);
+  assert.deepEqual(await generate(dir), [
+    { file: "korg-volca-fm.json", name: "X", manufacturer: "Y" },
+  ]);
 });
 
 test("non-json files are ignored", async () => {
@@ -62,7 +76,9 @@ test("non-json files are ignored", async () => {
     "korg-volca-fm.json": DEVICE,
   });
 
-  assert.deepEqual(await generate(dir), ["korg-volca-fm.json"]);
+  assert.deepEqual(await generate(dir), [
+    { file: "korg-volca-fm.json", name: "X", manufacturer: "Y" },
+  ]);
 });
 
 test("an empty devices directory produces an empty manifest", async () => {
@@ -70,9 +86,12 @@ test("an empty devices directory produces an empty manifest", async () => {
 });
 
 test("output is prettier-formatted, so lint stays happy", async () => {
-  const dir = await fixture({ "a.json": DEVICE, "b.json": DEVICE });
+  const dir = await fixture({ "a.json": device("A", "Maker") });
   await run("node", [SCRIPT], { cwd: dir });
 
   const written = await readFile(join(dir, "devices", "index.json"), "utf8");
-  assert.equal(written, '["a.json", "b.json"]\n');
+  assert.equal(
+    written,
+    '[{ "file": "a.json", "name": "A", "manufacturer": "Maker" }]\n',
+  );
 });

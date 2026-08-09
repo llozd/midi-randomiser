@@ -20,13 +20,15 @@ const present = (await readdir(DEVICES_DIR)).filter(
   (file) => file.endsWith(".json") && !NOT_DEVICES.has(file),
 );
 
+const listed = manifest.map((entry) => entry.file);
+
 for (const file of present) {
-  if (!manifest.includes(file)) {
+  if (!listed.includes(file)) {
     errors.push(`${file} is not listed in index.json`);
   }
 }
 
-for (const file of manifest) {
+for (const file of listed) {
   if (!present.includes(file)) {
     errors.push(`index.json lists ${file}, which does not exist`);
   }
@@ -34,7 +36,8 @@ for (const file of manifest) {
 
 const validate = new Ajv({ allErrors: true }).compile(schema);
 
-for (const file of manifest.filter((name) => present.includes(name))) {
+for (const entry of manifest.filter((item) => present.includes(item.file))) {
+  const { file } = entry;
   const device = await readJson(join(DEVICES_DIR, file));
 
   if (!validate(device)) {
@@ -42,6 +45,15 @@ for (const file of manifest.filter((name) => present.includes(name))) {
       errors.push(`${file}: ${error.instancePath || "/"} ${error.message}`);
     }
     continue;
+  }
+
+  // The manifest duplicates these two fields so the picker can be built
+  // without fetching every device, so they have to stay in step.
+  if (
+    entry.name !== device.name ||
+    entry.manufacturer !== device.manufacturer
+  ) {
+    errors.push(`${file}: index.json name/manufacturer is out of date`);
   }
 
   // Ranges are checked here rather than in the schema, which can't compare two

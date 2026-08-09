@@ -45,11 +45,17 @@ test("an empty manifest loads nothing", async () => {
 test("a missing manifest rejects", async () => {
   stubFetch({});
 
-  await assert.rejects(loadShippedDevices(), /devices\/index\.json returned 404/);
+  await assert.rejects(
+    loadShippedDevices(),
+    /devices\/index\.json returned 404/,
+  );
 });
 
 test("a device listed but missing rejects", async () => {
   stubFetch({ "devices/index.json": ["gone.json"] });
 
-  await assert.rejects(loadShippedDevices(), /devices\/gone\.json returned 404/);
+  await assert.rejects(
+    loadShippedDevices(),
+    /devices\/gone\.json returned 404/,
+  );
 });

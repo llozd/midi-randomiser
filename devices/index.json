@@ -1,1 +1,9 @@
-["behringer-cz-1-mini.json", "korg-volca-fm.json", "roland-s-1.json"]
+[
+  {
+    "file": "behringer-cz-1-mini.json",
+    "name": "CZ-1 MINI",
+    "manufacturer": "Behringer"
+  },
+  { "file": "korg-volca-fm.json", "name": "Volca FM", "manufacturer": "Korg" },
+  { "file": "roland-s-1.json", "name": "S-1", "manufacturer": "Roland" }
+]
