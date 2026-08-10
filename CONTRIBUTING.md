@@ -14,6 +14,14 @@ explains how.
 Once it is merged there it appears here on the next sync, usually within a day.
 Nothing needs doing in this repo.
 
+## Bugs and features
+
+Anything to do with the app itself is welcome here. Open an issue, or fork the
+repo and send a pull request.
+
+Note the split: how the app behaves is this repo's problem, but a device's
+parameters are the dataset's, as above.
+
 ## Working on the app
 
 ```bash
