@@ -6,3 +6,7 @@ Thumbs.db
 *.swp
 .idea/
 .vscode/
+
+# Generated from the MIDI Guide dataset by `npm run devices`
+.midi-guide/
+devices/generated/
