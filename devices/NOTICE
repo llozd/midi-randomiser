@@ -1,0 +1,34 @@
+Device data
+===========
+
+The device files this application loads are generated from the MIDI Guide
+dataset, maintained by Pencil Research.
+
+    Source:  https://github.com/pencilresearch/midi
+    Website: https://midi.guide/
+    Licence: Creative Commons Attribution-ShareAlike 4.0 International
+             https://creativecommons.org/licenses/by-sa/4.0/
+
+The generated files in devices/generated/ are a derivative of that dataset and
+are distributed under the same CC BY-SA 4.0 licence. The application itself is
+separately licensed - see LICENSE in the repository root.
+
+Changes made
+------------
+
+scripts/import-devices.mjs converts the dataset's CSV files into the JSON this
+application reads. The data is not edited, but the format is:
+
+  - Each device's rows become one JSON file, described by devices/schema.json.
+  - The nrpn_msb and nrpn_lsb columns are folded into a single 14-bit number.
+  - Rows carrying a cc_lsb are omitted. They pair two CC numbers into a single
+    14-bit value, which devices/schema.json cannot yet express.
+  - A row documenting both a CC and an NRPN is imported as the CC.
+  - Rows documenting neither a CC nor an NRPN are omitted, as are rows whose
+    values fall outside what devices/schema.json can express.
+  - Note trigger files (*.triggers.csv) are not imported.
+  - An "enabled" field is added, set on every parameter, which the application
+    uses to decide what to randomise.
+
+As Pencil Research note, portions of the dataset that refer to specific
+devices may be owned by those devices' respective manufacturers.

@@ -41,18 +41,19 @@ const entryFor = (file, device) => ({
 /** Temp repo with the real schema, the given device files, and a manifest. */
 async function fixture(devices, manifest) {
   const dir = await mkdtemp(join(tmpdir(), "midi-randomiser-validate-"));
-  await mkdir(join(dir, "devices"));
+  const generated = join(dir, "devices", "generated");
+  await mkdir(generated, { recursive: true });
   await copyFile(SCHEMA, join(dir, "devices", "schema.json"));
 
   for (const [name, contents] of Object.entries(devices)) {
-    await writeFile(join(dir, "devices", name), JSON.stringify(contents));
+    await writeFile(join(generated, name), JSON.stringify(contents));
   }
 
   const entries =
     manifest ??
     Object.entries(devices).map(([file, device]) => entryFor(file, device));
 
-  await writeFile(join(dir, "devices", "index.json"), JSON.stringify(entries));
+  await writeFile(join(generated, "index.json"), JSON.stringify(entries));
   return dir;
 }
 

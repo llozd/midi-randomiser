@@ -1,44 +1,48 @@
 # Contributing
 
-The most useful contribution is a new device: one JSON file describing an
-instrument's CC and NRPN parameters.
+## Adding or fixing a device
 
-## Adding a device
+Devices are not maintained here. They come from the
+[MIDI Guide dataset](https://github.com/pencilresearch/midi) by Pencil
+Research, which documents the MIDI implementation of several hundred
+instruments and is rebuilt into this app on every deploy.
 
-1. Create `devices/<manufacturer>-<model>.json`, kebab-case, for example
-   `korg-volca-fm.json`.
-2. Fill it in using the format below.
-3. Run `npm run manifest` to add it to `devices/index.json`. The app discovers
-   devices through that manifest, because a static host can't list a directory.
-4. Run `npm run lint` and open a pull request. It runs in CI and must pass - it
-   validates device files against `devices/schema.json` and fails if the
-   manifest is out of date.
+So if a device is missing, or a CC number is wrong, send it there. Their
+[contributing guide](https://github.com/pencilresearch/midi/blob/main/CONTRIBUTING.md)
+explains how.
 
-## Device format
+Once it is merged there it appears here on the next sync, usually within a day.
+Nothing needs doing in this repo.
 
-```json
-{
-  "name": "Volca FM",
-  "manufacturer": "Korg",
-  "schemaVersion": 1,
-  "parameters": [
-    {
-      "name": "LFO rate",
-      "type": "cc",
-      "number": 46,
-      "min": 0,
-      "max": 127,
-      "enabled": true
-    }
-  ]
-}
+## Bugs and features
+
+Anything to do with the app itself is welcome here. Open an issue, or fork the
+repo and send a pull request.
+
+Note the split: how the app behaves is this repo's problem, but a device's
+parameters are the dataset's, as above.
+
+## Working on the app
+
+```bash
+npm install    # installs linters and sets up the pre-commit hook
+npm run devices    # clones the dataset and generates devices/generated/
+npm run lint       # eslint + stylelint + json format + html + device files
+npm test           # node:test, no watch mode
 ```
 
-- `type` is `"cc"` (number and values 0-127) or `"nrpn"` (14-bit, 0-16383).
-- `min` and `max` bound what Randomise sends, so they can be narrower than the
-  full range.
-- `enabled` is whether the parameter is randomised by default.
+`npm run devices` has to run at least once before the app has anything to load
+and before `npm run lint` can validate it. It clones into `.midi-guide/` and
+writes to `devices/generated/`, both of which are gitignored. Pass a path to
+convert an existing clone instead:
+
+```bash
+node scripts/import-devices.mjs ../midi
+```
+
+Lint and tests run in CI on every pull request and must pass before merge.
 
 ## Releases
 
-The maintainer updates `CHANGELOG.md` and tags releases. Nothing to do here.
+The version, changelog and GitHub release are updated automatically when the
+dataset changes. Nothing to do here.

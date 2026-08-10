@@ -4,11 +4,13 @@ A small web application for sending random CC and NRPN values to MIDI devices.
 
 Live at <https://llozd.github.io/midi-randomiser/>
 
-Features configurable devices by creating sets of MIDI parameters (CC or NRPN, each with a
-number and a value range) - pick a MIDI output and channel, and hit **Randomise**
-to send a fresh random value to every enabled parameter.
+Pick your synth, choose which parameters to include, and hit **Randomise** to
+send a fresh random value to every enabled one.
 
-Devices can be imported, saved, and exported, and are stored in JSON format.
+Several hundred instruments are covered, using the
+[MIDI Guide dataset](https://github.com/pencilresearch/midi) maintained by
+Pencil Research. The device list rebuilds itself from that dataset, so it stays
+current without anyone maintaining it here.
 
 ![MIDI Randomiser with a device loaded, showing its parameters and their ranges](docs/screenshot.png)
 
@@ -21,8 +23,15 @@ Devices can be imported, saved, and exported, and are stored in JSON format.
 
 ## Running locally
 
-The app is plain static files with no build step. Serve the folder over HTTP and
-open it in Chrome/Edge:
+The app is plain static files, but the device data is generated rather than
+committed, so it needs building once:
+
+```bash
+npm install
+npm run devices    # clones the dataset, writes devices/generated/
+```
+
+Then serve the folder over HTTP and open it in Chrome/Edge:
 
 ```bash
 npx serve
@@ -32,17 +41,16 @@ python3 -m http.server
 
 ## Development
 
-Dev tooling is managed with npm. It is only needed for contributing -
-running the app itself needs no install.
+See [CONTRIBUTING.md](CONTRIBUTING.md). If a device is missing or wrong, the
+fix goes to
+[the dataset](https://github.com/pencilresearch/midi), not here.
 
-```bash
-npm install    # installs linters and sets up the pre-commit hook
-npm run lint   # eslint + stylelint + json format + html + device files
-npm run manifest   # rebuild devices/index.json after adding a device
-```
+## Licence
 
-Linting runs in CI on every pull request and must pass before merge.
+The application is MIT licensed - see [LICENSE](LICENSE).
 
-## Adding a device
-
-Devices are plain JSON files in `devices/`. See [CONTRIBUTING.md](CONTRIBUTING.md).
+The device data is from
+[MIDI Guide](https://midi.guide/) by Pencil Research, used under
+[CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) and converted
+from CSV to JSON. See [devices/NOTICE](devices/NOTICE) for what the conversion
+changes.

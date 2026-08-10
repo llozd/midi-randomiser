@@ -1,24 +1,37 @@
 /**
- * Validates every shipped device file against devices/schema.json, and checks
- * that the manifest and the directory agree. Run as part of `npm run lint`.
+ * Validates the generated device files against devices/schema.json, and checks
+ * that the manifest and the directory agree. Run as part of `npm run lint`,
+ * and in the build before anything is deployed.
  */
 
 import { readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import Ajv from "ajv/dist/2020.js";
 
-const DEVICES_DIR = "devices";
-const NOT_DEVICES = new Set(["schema.json", "index.json"]);
+const DEVICES_DIR = join("devices", "generated");
+const SCHEMA = join("devices", "schema.json");
+const NOT_DEVICES = new Set(["index.json"]);
 
 const readJson = async (path) => JSON.parse(await readFile(path, "utf8"));
 
 const errors = [];
 
-const schema = await readJson(join(DEVICES_DIR, "schema.json"));
-const manifest = await readJson(join(DEVICES_DIR, "index.json"));
-const present = (await readdir(DEVICES_DIR)).filter(
-  (file) => file.endsWith(".json") && !NOT_DEVICES.has(file),
-);
+const schema = await readJson(SCHEMA);
+
+let manifest;
+let present;
+
+try {
+  manifest = await readJson(join(DEVICES_DIR, "index.json"));
+  present = (await readdir(DEVICES_DIR)).filter(
+    (file) => file.endsWith(".json") && !NOT_DEVICES.has(file),
+  );
+} catch {
+  console.error(
+    `No devices in ${DEVICES_DIR}. Run \`npm run devices\` to generate them.`,
+  );
+  process.exit(1);
+}
 
 const listed = manifest.map((entry) => entry.file);
 
