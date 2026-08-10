@@ -94,13 +94,18 @@ const integer = (value, fallback) => {
   return Number.isNaN(parsed) ? fallback : parsed;
 };
 
+/** A row pairing two CC numbers into one 14-bit value. */
+export const isWideCC = (row) => Boolean(row.cc_msb && row.cc_lsb);
+
 /**
  * One row becomes at most one parameter. Rows documenting both a CC and an
  * NRPN take the CC: it is a single message rather than a four-message
  * sequence, and any device listing both accepts both.
  *
- * cc_lsb is ignored, so 14-bit CCs are imported as their 7-bit MSB. The app's
- * schema has no way to express a CC pair.
+ * Rows carrying a cc_lsb are skipped. They pair two CC numbers into one
+ * 14-bit value, which the schema has no way to express, and importing the
+ * coarse half alone would mean reinterpreting a range the dataset documents
+ * inconsistently.
  */
 export function toParameter(row) {
   const label = row.parameter_name;
@@ -108,24 +113,16 @@ export function toParameter(row) {
   if (row.cc_msb) {
     const number = integer(row.cc_msb, null);
 
-    if (number === null) {
+    if (number === null || isWideCC(row)) {
       return false;
     }
-
-    const min = integer(row.cc_min_value, 0);
-    const max = integer(row.cc_max_value, CC_MAX);
-
-    // A CC value can't exceed 127, so a wider range must describe a 14-bit
-    // pair. Only the MSB is sent, so that range scales down with it. Rows
-    // that pair a cc_lsb with a 0-127 range already describe the MSB.
-    const scale = max > CC_MAX ? 128 : 1;
 
     return {
       name: label || `CC ${number}`,
       type: "cc",
       number,
-      min: Math.floor(min / scale),
-      max: Math.floor(max / scale),
+      min: integer(row.cc_min_value, 0),
+      max: integer(row.cc_max_value, CC_MAX),
       enabled: true,
     };
   }
@@ -175,15 +172,16 @@ export function toDevice(text) {
   const rows = readRows(text);
 
   if (rows.length === 0) {
-    return { device: null, dropped: 0 };
+    return { device: null, dropped: 0, wide: 0 };
   }
 
   const candidates = rows.map(toParameter).filter(Boolean);
   const parameters = candidates.filter(isUsable);
   const dropped = candidates.length - parameters.length;
+  const wide = rows.filter(isWideCC).length;
 
   if (parameters.length === 0) {
-    return { device: null, dropped };
+    return { device: null, dropped, wide };
   }
 
   const { manufacturer, device } = rows[0];
@@ -191,6 +189,7 @@ export function toDevice(text) {
   return {
     device: { name: device, manufacturer, schemaVersion: 1, parameters },
     dropped,
+    wide,
   };
 }
 
@@ -232,10 +231,12 @@ async function main(source) {
   const index = [];
   let skippedDevices = 0;
   let droppedParameters = 0;
+  let wideParameters = 0;
 
   for (const path of await deviceFiles(source)) {
-    const { device, dropped } = toDevice(await readFile(path, "utf8"));
+    const { device, dropped, wide } = toDevice(await readFile(path, "utf8"));
     droppedParameters += dropped;
+    wideParameters += wide;
 
     if (!device) {
       console.warn(`No usable parameters in ${path}`);
@@ -262,6 +263,7 @@ async function main(source) {
     [
       `Wrote ${index.length} device(s) to ${OUT_DIR}.`,
       skippedDevices > 0 && `Skipped ${skippedDevices} device(s).`,
+      wideParameters > 0 && `Skipped ${wideParameters} 14-bit CC parameter(s).`,
       droppedParameters > 0 &&
         `Dropped ${droppedParameters} parameter(s) the schema can't express.`,
     ]
