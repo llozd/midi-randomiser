@@ -12,6 +12,7 @@
 import { execFile } from "node:child_process";
 import { mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 import { format } from "prettier";
 
@@ -82,7 +83,9 @@ export function readRows(text) {
   }
 
   return rest.map((cells) =>
-    Object.fromEntries(header.map((name, i) => [name, (cells[i] ?? "").trim()])),
+    Object.fromEntries(
+      header.map((name, i) => [name, (cells[i] ?? "").trim()]),
+    ),
   );
 }
 
@@ -154,11 +157,7 @@ export function isUsable({ type, number, min, max }) {
   const ceiling = type === "cc" ? CC_MAX : NRPN_MAX;
 
   return (
-    number >= 0 &&
-    number <= ceiling &&
-    min >= 0 &&
-    max <= ceiling &&
-    min <= max
+    number >= 0 && number <= ceiling && min >= 0 && max <= ceiling && min <= max
   );
 }
 
@@ -226,46 +225,52 @@ async function deviceFiles(source) {
 const writeJson = async (path, value) =>
   writeFile(path, await format(JSON.stringify(value), { parser: "json" }));
 
-const source = process.argv[2] ?? (await cloneUpstream());
+async function main(source) {
+  await rm(OUT_DIR, { recursive: true, force: true });
+  await mkdir(OUT_DIR, { recursive: true });
 
-await rm(OUT_DIR, { recursive: true, force: true });
-await mkdir(OUT_DIR, { recursive: true });
+  const index = [];
+  let skippedDevices = 0;
+  let droppedParameters = 0;
 
-const index = [];
-let skippedDevices = 0;
-let droppedParameters = 0;
+  for (const path of await deviceFiles(source)) {
+    const { device, dropped } = toDevice(await readFile(path, "utf8"));
+    droppedParameters += dropped;
 
-for (const path of await deviceFiles(source)) {
-  const { device, dropped } = toDevice(await readFile(path, "utf8"));
-  droppedParameters += dropped;
+    if (!device) {
+      console.warn(`No usable parameters in ${path}`);
+      skippedDevices += 1;
+      continue;
+    }
 
-  if (!device) {
-    console.warn(`No usable parameters in ${path}`);
-    skippedDevices += 1;
-    continue;
+    const file = `${slug(device.manufacturer)}-${slug(device.name)}.json`;
+
+    await writeJson(join(OUT_DIR, file), device);
+    index.push({ file, name: device.name, manufacturer: device.manufacturer });
   }
 
-  const file = `${slug(device.manufacturer)}-${slug(device.name)}.json`;
+  // Sorted the way the picker reads it: manufacturer first, then model.
+  index.sort(
+    (a, b) =>
+      a.manufacturer.localeCompare(b.manufacturer) ||
+      a.name.localeCompare(b.name),
+  );
 
-  await writeJson(join(OUT_DIR, file), device);
-  index.push({ file, name: device.name, manufacturer: device.manufacturer });
+  await writeJson(join(OUT_DIR, "index.json"), index);
+
+  console.log(
+    [
+      `Wrote ${index.length} device(s) to ${OUT_DIR}.`,
+      skippedDevices > 0 && `Skipped ${skippedDevices} device(s).`,
+      droppedParameters > 0 &&
+        `Dropped ${droppedParameters} parameter(s) the schema can't express.`,
+    ]
+      .filter(Boolean)
+      .join(" "),
+  );
 }
 
-// Sorted the way the picker reads it: manufacturer first, then model.
-index.sort(
-  (a, b) =>
-    a.manufacturer.localeCompare(b.manufacturer) || a.name.localeCompare(b.name),
-);
-
-await writeJson(join(OUT_DIR, "index.json"), index);
-
-console.log(
-  [
-    `Wrote ${index.length} device(s) to ${OUT_DIR}.`,
-    skippedDevices > 0 && `Skipped ${skippedDevices} device(s).`,
-    droppedParameters > 0 &&
-      `Dropped ${droppedParameters} parameter(s) the schema can't express.`,
-  ]
-    .filter(Boolean)
-    .join(" "),
-);
+// Only convert when run as a command. The tests import the functions above.
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  await main(process.argv[2] ?? (await cloneUpstream()));
+}
