@@ -7,13 +7,9 @@ Devices are not maintained here. They come from the
 Research, which documents the MIDI implementation of several hundred
 instruments and is rebuilt into this app on every deploy.
 
-So if a device is missing, or a CC number is wrong, send it there:
-
-1. Grab
-   [`template.csv`](https://raw.githubusercontent.com/pencilresearch/midi/main/template.csv)
-   from their repo and fill it in, or edit the existing file for your device.
-2. Open a pull request against `pencilresearch/midi`, or email it to
-   <midi@midi.guide> and they will publish it for you.
+So if a device is missing, or a CC number is wrong, send it there. Their
+[contributing guide](https://github.com/pencilresearch/midi/blob/main/CONTRIBUTING.md)
+explains how.
 
 Once it is merged there it appears here on the next sync, usually within a day.
 Nothing needs doing in this repo.
