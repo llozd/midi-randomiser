@@ -1,10 +1,10 @@
 /**
  * Static hosts can't list a directory, so devices are discovered through the
- * devices/index.json manifest. It carries enough to build the picker, and a
+ * devices/generated/index.json manifest. It carries enough to build the picker, and a
  * device file is only fetched once that device is selected.
  */
 
-const DEVICES_PATH = "devices/";
+const DEVICES_PATH = "devices/generated/";
 
 async function fetchJson(path) {
   const response = await fetch(path);

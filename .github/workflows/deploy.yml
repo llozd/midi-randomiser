@@ -24,6 +24,7 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
+      - run: npm run devices
       - run: npm run lint
       - run: npm test
 
@@ -36,13 +37,22 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
       - uses: actions/configure-pages@v5
+      - name: Generate the devices from the MIDI Guide dataset
+        run: |
+          npm ci
+          npm run devices
       - name: Assemble the site
         # Only the files the app needs - no tooling, tests or docs.
         run: |
-          mkdir _site
+          mkdir -p _site/devices
           cp index.html _site/
-          cp -r css js devices _site/
+          cp -r css js _site/
+          cp -r devices/generated _site/devices/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
