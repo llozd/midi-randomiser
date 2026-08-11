@@ -57,25 +57,13 @@ jobs:
       - name: Resolve the dataset commit to build
         id: upstream
         env:
-          GH_TOKEN: ${{ github.token }}
           UPSTREAM: ${{ inputs.upstream }}
         run: |
-          sha="$UPSTREAM"
-
-          # A push deploys the dataset the last release was cut from, so an app
-          # change can't quietly ship device changes nothing describes.
-          if [ -z "$sha" ]; then
-            sha=$(gh release view --json body --jq .body 2>/dev/null \
-              | grep -oE 'pencilresearch/midi@[0-9a-f]{40}' \
-              | cut -d@ -f2 || true)
-          fi
-
-          if [ -z "$sha" ]; then
-            sha=$(gh api repos/pencilresearch/midi/commits/main --jq .sha)
-            echo "No release to pin to, building from $sha."
-          fi
-
+          # A push builds whatever devices/SOURCE records, so an app change
+          # can't quietly ship device changes that nothing describes.
+          sha="${UPSTREAM:-$(cat devices/SOURCE)}"
           echo "sha=$sha" >> "$GITHUB_OUTPUT"
+          echo "Building devices from $sha."
 
       - name: Generate the devices from the MIDI Guide dataset
         env:
