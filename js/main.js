@@ -21,7 +21,7 @@ const deviceSelect = document.querySelector("#device-select");
 const randomiseButton = document.querySelector("#randomise");
 const deviceStatus = document.querySelector("#device-status");
 
-const NUMERIC_FIELDS = new Set(["number", "min", "max"]);
+const NUMERIC_FIELDS = new Set(["min", "max"]);
 
 let connected = false;
 // Manifest entries: { file, name, manufacturer }. The device itself is only

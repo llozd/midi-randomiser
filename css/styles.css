@@ -262,9 +262,30 @@
       background: var(--surface-raised);
     }
 
-    input,
-    select {
+    input {
       width: 100%;
+    }
+
+    /* Read-only cells. They describe the parameter rather than control it, so
+       they sit flat against the row instead of looking like inputs. */
+    .parameter-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .parameter-type {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .parameter-number {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-variant-numeric: tabular-nums;
     }
 
     .parameter-enabled {

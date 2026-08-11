@@ -82,18 +82,9 @@
 
         <template id="parameter-row">
           <li class="parameter">
-            <input class="parameter-name" data-field="name" type="text" />
-            <select class="parameter-type" data-field="type">
-              <option value="cc">CC</option>
-              <option value="nrpn">NRPN</option>
-            </select>
-            <input
-              class="parameter-number"
-              data-field="number"
-              type="number"
-              min="0"
-              max="16383"
-            />
+            <span class="parameter-name" data-field="name"></span>
+            <span class="parameter-type" data-field="type"></span>
+            <span class="parameter-number" data-field="number"></span>
             <input
               class="parameter-min"
               data-field="min"
