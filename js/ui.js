@@ -6,13 +6,16 @@ const parameterTemplate = document.querySelector("#parameter-row");
 function createRow(parameter) {
   const row = parameterTemplate.content.firstElementChild.cloneNode(true);
 
-  for (const input of row.querySelectorAll("[data-field]")) {
-    const value = parameter[input.dataset.field];
+  // Only the range and checkbox are inputs; the rest are read-only cells.
+  for (const cell of row.querySelectorAll("[data-field]")) {
+    const value = parameter[cell.dataset.field];
 
-    if (input.type === "checkbox") {
-      input.checked = value;
+    if (cell.type === "checkbox") {
+      cell.checked = value;
+    } else if (cell.tagName === "INPUT") {
+      cell.value = value;
     } else {
-      input.value = value;
+      cell.textContent = value;
     }
   }
 

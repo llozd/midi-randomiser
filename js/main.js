@@ -21,11 +21,10 @@ const deviceSelect = document.querySelector("#device-select");
 const randomiseButton = document.querySelector("#randomise");
 const deviceStatus = document.querySelector("#device-status");
 
-const NUMERIC_FIELDS = new Set(["number", "min", "max"]);
+const NUMERIC_FIELDS = new Set(["min", "max"]);
 
 let connected = false;
-// Manifest entries: { file, name, manufacturer }. The device itself is only
-// fetched on selection.
+// Manifest entries; the device itself is fetched on selection.
 let index = [];
 let currentDevice = null;
 // Bumped on every selection, so a slow fetch can't overwrite a newer one.
@@ -110,8 +109,7 @@ function renderManufacturerOptions() {
     return;
   }
 
-  // The manifest already arrives sorted by manufacturer, so first-seen order
-  // is alphabetical.
+  // The manifest arrives sorted, so first-seen order is alphabetical.
   const manufacturers = [...new Set(index.map((entry) => entry.manufacturer))];
 
   manufacturerSelect.replaceChildren(
@@ -136,8 +134,7 @@ function renderModelOptions(manufacturer) {
   deviceSelect.replaceChildren(
     ...models.map((entry) => {
       const option = document.createElement("option");
-      // Keyed by filename rather than position, so the value survives the
-      // list being rebuilt.
+      // Keyed by filename, so the value survives the list being rebuilt.
       option.value = entry.file;
       option.textContent = entry.name;
       return option;
@@ -266,8 +263,7 @@ channelSelect.addEventListener("change", () => {
 
 randomiseButton.addEventListener("click", randomise);
 
-// Keep the parameter objects in step with the inputs, so Randomise uses what
-// is on screen rather than what the device file shipped with.
+// Keeps Randomise using what's on screen, not what the file shipped with.
 onParameterEdit((index, field, value) => {
   const parameter = currentDevice?.parameters[index];
 

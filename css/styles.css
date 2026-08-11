@@ -113,8 +113,7 @@
     gap: 1rem;
   }
 
-  /* Sections are flex rows: a full-width child forces whatever follows onto a
-     new line, which keeps the markup free of layout-only wrappers. */
+  /* Flex rows: a full-width child pushes what follows onto a new line. */
   main > section {
     display: flex;
     flex-wrap: wrap;
@@ -262,9 +261,29 @@
       background: var(--surface-raised);
     }
 
-    input,
-    select {
+    input {
       width: 100%;
+    }
+
+    /* Read-only cells, so they sit flat rather than looking like inputs. */
+    .parameter-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .parameter-type {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .parameter-number {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-variant-numeric: tabular-nums;
     }
 
     .parameter-enabled {

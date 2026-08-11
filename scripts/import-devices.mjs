@@ -1,13 +1,4 @@
-/**
- * Converts the MIDI Guide CSV dataset into the device JSON the app loads.
- *
- * Source: https://github.com/pencilresearch/midi (CC BY-SA 4.0). One CSV per
- * device becomes one JSON file in devices/generated/, plus the index the app
- * discovers them through. Nothing here is committed - it is rebuilt on every
- * deploy, and locally with `npm run devices`.
- *
- * Pass a path to an existing clone to convert that instead of fetching one.
- */
+// Converts the MIDI Guide dataset (CC BY-SA 4.0) into the app's device JSON.
 
 import { execFile } from "node:child_process";
 import { mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
@@ -25,10 +16,7 @@ const OUT_DIR = join("devices", "generated");
 const CC_MAX = 127;
 const NRPN_MAX = 16383;
 
-/**
- * Minimal RFC 4180 reader. The dataset has quoted fields containing commas,
- * escaped quotes and, in one file, newlines, so it can't be split on lines.
- */
+/** Minimal RFC 4180 reader: quoted commas, quotes, embedded newlines. */
 export function parseCsv(text) {
   const rows = [];
   let row = [];
@@ -97,16 +85,7 @@ const integer = (value, fallback) => {
 /** A row pairing two CC numbers into one 14-bit value. */
 export const isWideCC = (row) => Boolean(row.cc_msb && row.cc_lsb);
 
-/**
- * One row becomes at most one parameter. Rows documenting both a CC and an
- * NRPN take the CC: it is a single message rather than a four-message
- * sequence, and any device listing both accepts both.
- *
- * Rows carrying a cc_lsb are skipped. They pair two CC numbers into one
- * 14-bit value, which the schema has no way to express, and importing the
- * coarse half alone would mean reinterpreting a range the dataset documents
- * inconsistently.
- */
+/** One row becomes at most one parameter, preferring the CC over the NRPN. */
 export function toParameter(row) {
   const label = row.parameter_name;
 
@@ -164,10 +143,7 @@ export const slug = (value) =>
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
 
-/**
- * Converts one CSV's text into a device, or null if nothing survives. Returns
- * the count of rows dropped as unrepresentable so the run can report them.
- */
+/** Converts one CSV into a device, with counts of what it couldn't import. */
 export function toDevice(text) {
   const rows = readRows(text);
 

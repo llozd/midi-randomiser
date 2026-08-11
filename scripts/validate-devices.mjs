@@ -1,8 +1,4 @@
-/**
- * Validates the generated device files against devices/schema.json, and checks
- * that the manifest and the directory agree. Run as part of `npm run lint`,
- * and in the build before anything is deployed.
- */
+// Validates the generated devices against devices/schema.json before deploy.
 
 import { readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
@@ -60,8 +56,7 @@ for (const entry of manifest.filter((item) => present.includes(item.file))) {
     continue;
   }
 
-  // The manifest duplicates these two fields so the picker can be built
-  // without fetching every device, so they have to stay in step.
+  // The manifest duplicates these, so they have to stay in step.
   if (
     entry.name !== device.name ||
     entry.manufacturer !== device.manufacturer
@@ -69,8 +64,7 @@ for (const entry of manifest.filter((item) => present.includes(item.file))) {
     errors.push(`${file}: index.json name/manufacturer is out of date`);
   }
 
-  // Ranges are checked here rather than in the schema, which can't compare two
-  // sibling properties.
+  // The schema can't compare sibling properties, so ranges are checked here.
   for (const [index, parameter] of device.parameters.entries()) {
     if (parameter.min > parameter.max) {
       errors.push(
