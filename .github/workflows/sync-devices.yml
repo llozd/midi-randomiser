@@ -125,9 +125,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           VERSION: ${{ steps.release.outputs.version }}
           LATEST: ${{ needs.check.outputs.latest }}
+        # The release body is the changelog entry, and devices/SOURCE in the
+        # same commit records which dataset commit it came from.
         run: |
-          printf '\n---\n\nBuilt from pencilresearch/midi@%s\n' "$LATEST" >> notes.md
-
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           echo "$LATEST" > devices/SOURCE
@@ -136,4 +136,4 @@ jobs:
           git tag "v$VERSION"
           git push origin HEAD:main --tags
 
-          gh release create "v$VERSION" --title "$VERSION" --notes-file notes.md
+          gh release create "v$VERSION" --title "v$VERSION" --notes-file notes.md

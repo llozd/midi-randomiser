@@ -2,8 +2,9 @@
  * Turns a diff of the MIDI Guide dataset into a release.
  *
  * Reads `git diff --name-status` on stdin, bumps the version in package.json,
- * adds a CHANGELOG.md entry, and writes the release notes to the path given as
- * the first argument. Run by .github/workflows/sync-devices.yml.
+ * adds a CHANGELOG.md entry, and writes that same entry to the path given as
+ * the first argument, for use as the release body. Run by
+ * .github/workflows/sync-devices.yml.
  *
  * Adding a device is a minor bump; editing or removing one is a patch.
  */
@@ -134,8 +135,8 @@ async function main(notesPath, diff) {
     updateChangelog(changelog, version, previous, entry),
   );
 
-  // The release notes name every device, where the changelog caps the lists.
-  await writeFile(notesPath, entryBody(changes, Infinity));
+  // The release body is the changelog entry, so the two can't drift apart.
+  await writeFile(notesPath, entryBody(changes));
 
   console.log(version);
 }
