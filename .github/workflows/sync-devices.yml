@@ -44,9 +44,34 @@ jobs:
           if [ "$latest" = "$previous" ]; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
             echo "Already on $latest, nothing to do."
-          else
+            exit 0
+          fi
+
+          # Upstream moved, but plenty of their commits are merges, trigger
+          # files or their own tooling. Only device files affect this app.
+          if [ -z "$previous" ]; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
-            echo "Dataset moved from ${previous:-nothing} to $latest."
+            echo "No previous release, treating $latest as a first import."
+            exit 0
+          fi
+
+          files=$(gh api --paginate "repos/pencilresearch/midi/compare/$previous...$latest" \
+            --jq '.files[].filename' 2>/dev/null || echo UNKNOWN)
+
+          if [ "$files" = "UNKNOWN" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "Could not compare against $previous, rebuilding to be safe."
+            exit 0
+          fi
+
+          devices=$(echo "$files" | grep -E '^[^/]+/.+\.csv$' | grep -vc '\.triggers\.csv$' || true)
+
+          if [ "${devices:-0}" -gt 0 ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "$devices device file(s) changed between $previous and $latest."
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "Dataset moved to $latest but no device files changed."
           fi
 
   deploy:
