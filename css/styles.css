@@ -291,6 +291,11 @@
     }
   }
 
+  #toggle-all {
+    margin-bottom: 0.5rem;
+    font-size: 0.8rem;
+  }
+
   #randomise {
     height: 2.4rem;
     margin-top: 0.9rem;

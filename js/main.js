@@ -11,7 +11,11 @@ import {
   setOutput,
 } from "./midi.js";
 import { randomiseParameters } from "./randomiser.js";
-import { onParameterEdit, renderParameters } from "./ui.js";
+import {
+  onParameterEdit,
+  renderParameters,
+  setAllEnabled,
+} from "./ui.js";
 
 const outputSelect = document.querySelector("#midi-output");
 const channelSelect = document.querySelector("#midi-channel");
@@ -20,6 +24,7 @@ const statusLine = document.querySelector("#midi-status");
 const manufacturerSelect = document.querySelector("#manufacturer-select");
 const deviceSelect = document.querySelector("#device-select");
 const randomiseButton = document.querySelector("#randomise");
+const toggleAllButton = document.querySelector("#toggle-all");
 const deviceStatus = document.querySelector("#device-status");
 
 const NUMERIC_FIELDS = new Set(["min", "max"]);
@@ -156,6 +161,30 @@ function selectManufacturer(manufacturer) {
   return selectDevice(first.file);
 }
 
+/** The button both reports and flips the state, so its label follows it. */
+function updateToggleAll() {
+  const parameters = currentDevice?.parameters ?? [];
+  const allOn = parameters.length > 0 && parameters.every((p) => p.enabled);
+
+  toggleAllButton.disabled = parameters.length === 0;
+  toggleAllButton.textContent = allOn ? "Disable all" : "Enable all";
+}
+
+function toggleAll() {
+  if (!currentDevice) {
+    return;
+  }
+
+  const enabled = !currentDevice.parameters.every((p) => p.enabled);
+
+  for (const parameter of currentDevice.parameters) {
+    parameter.enabled = enabled;
+  }
+
+  setAllEnabled(enabled);
+  updateToggleAll();
+}
+
 async function selectDevice(file) {
   const entry = index.find((item) => item.file === file);
 
@@ -169,6 +198,7 @@ async function selectDevice(file) {
   const token = ++selectionToken;
   currentDevice = null;
   renderParameters([]);
+  updateToggleAll();
   setDeviceStatus(`Loading ${deviceLabel(entry)}...`);
 
   let device;
@@ -193,6 +223,7 @@ async function selectDevice(file) {
   currentDevice = device;
   setDeviceStatus("");
   renderParameters(device.parameters);
+  updateToggleAll();
 }
 
 function randomise() {
@@ -265,6 +296,7 @@ channelSelect.addEventListener("change", () => {
 });
 
 randomiseButton.addEventListener("click", randomise);
+toggleAllButton.addEventListener("click", toggleAll);
 
 // Keeps Randomise using what's on screen, not what the file shipped with.
 onParameterEdit((index, field, value) => {
@@ -272,6 +304,10 @@ onParameterEdit((index, field, value) => {
 
   if (parameter) {
     parameter[field] = NUMERIC_FIELDS.has(field) ? Number(value) : value;
+  }
+
+  if (field === "enabled") {
+    updateToggleAll();
   }
 });
 
