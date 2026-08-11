@@ -130,6 +130,8 @@ jobs:
         # The release body is the changelog entry, and devices/SOURCE in the
         # same commit records which dataset commit it came from.
         run: |
+          # The numeric prefix is the bot's account id, which is what links
+          # the commit to it rather than to nobody.
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           echo "$LATEST" > devices/SOURCE
