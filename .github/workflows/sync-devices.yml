@@ -1,7 +1,6 @@
 name: sync devices
 
-# GitHub only delivers events to workflows in the repo they happened in, so
-# there is no way to be told when the dataset changes. This polls instead.
+# Nothing can notify us when another repo changes, so this polls for it.
 on:
   schedule:
     - cron: "0 */8 * * *"
@@ -33,8 +32,7 @@ jobs:
         run: |
           latest=$(gh api repos/pencilresearch/midi/commits/main --jq .sha)
 
-          # devices/SOURCE is the only state kept between runs, so releases
-          # made by hand can't disturb it.
+          # devices/SOURCE is the only state kept between runs.
           previous=$(cat devices/SOURCE)
 
           echo "latest=$latest" >> "$GITHUB_OUTPUT"
@@ -46,8 +44,7 @@ jobs:
             exit 0
           fi
 
-          # Upstream moved, but plenty of their commits are merges, trigger
-          # files or their own tooling. Only device files affect this app.
+          # Upstream commits plenty this app doesn't care about.
           files=$(gh api --paginate "repos/pencilresearch/midi/compare/$previous...$latest" \
             --jq '.files[].filename' 2>/dev/null || echo UNKNOWN)
 
@@ -99,16 +96,14 @@ jobs:
           # Full clone: diffing two commits needs the history between them.
           git clone --quiet https://github.com/pencilresearch/midi.git .midi-guide
 
-          # Without this, git escapes non-ascii paths and four devices with
-          # accented names go missing from the notes.
+          # Without this, git escapes non-ascii paths and they go missing.
           git -C .midi-guide config core.quotePath false
 
           if git -C .midi-guide cat-file -e "$PREVIOUS^{commit}" 2>/dev/null; then
             git -C .midi-guide diff --name-status "$PREVIOUS" "$LATEST" -- '*.csv' \
               > "$RUNNER_TEMP/changes.txt"
           else
-            # Upstream rewrote history. Treat every device as added rather
-            # than failing the run.
+            # Upstream rewrote history, so treat every device as added.
             git -C .midi-guide ls-tree -r --name-only "$LATEST" \
               | grep '\.csv$' | sed 's/^/A\t/' > "$RUNNER_TEMP/changes.txt"
           fi
@@ -127,11 +122,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           VERSION: ${{ steps.release.outputs.version }}
           LATEST: ${{ needs.check.outputs.latest }}
-        # The release body is the changelog entry, and devices/SOURCE in the
-        # same commit records which dataset commit it came from.
+        # The release body is the changelog entry, written by release.mjs.
         run: |
-          # The numeric prefix is the bot's account id, which is what links
-          # the commit to it rather than to nobody.
+          # The numeric prefix is the bot's account id, and links the commit.
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           echo "$LATEST" > devices/SOURCE

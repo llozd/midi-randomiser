@@ -13,8 +13,7 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-        # The device files are generated, not committed, so lint has to have
-        # something to validate.
+        # Devices are generated, so lint needs something to validate.
       - run: npm run devices
       - run: npm run lint
       - run: npm test

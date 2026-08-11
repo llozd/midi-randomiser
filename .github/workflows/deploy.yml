@@ -3,8 +3,7 @@ name: deploy
 on:
   push:
     branches: [main]
-    # Neither is part of the site, and the sync workflow commits them after
-    # deploying, so rebuilding for them would be a wasted round trip.
+    # Neither is part of the site, so neither is worth a rebuild.
     paths-ignore:
       - package.json
       - CHANGELOG.md
@@ -59,8 +58,7 @@ jobs:
         env:
           UPSTREAM: ${{ inputs.upstream }}
         run: |
-          # A push builds whatever devices/SOURCE records, so an app change
-          # can't quietly ship device changes that nothing describes.
+          # A push builds what devices/SOURCE records, not upstream latest.
           sha="${UPSTREAM:-$(cat devices/SOURCE)}"
           echo "sha=$sha" >> "$GITHUB_OUTPUT"
           echo "Building devices from $sha."
