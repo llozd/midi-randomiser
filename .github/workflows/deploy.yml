@@ -3,6 +3,16 @@ name: deploy
 on:
   push:
     branches: [main]
+    # Neither is part of the site, so neither is worth a rebuild.
+    paths-ignore:
+      - package.json
+      - CHANGELOG.md
+  workflow_call:
+    inputs:
+      upstream:
+        description: Dataset commit to build the devices from.
+        type: string
+        required: true
 
 permissions:
   contents: read
@@ -42,10 +52,27 @@ jobs:
           node-version: 24
           cache: npm
       - uses: actions/configure-pages@v5
+
+      - name: Resolve the dataset commit to build
+        id: upstream
+        env:
+          UPSTREAM: ${{ inputs.upstream }}
+        run: |
+          # A push builds what devices/SOURCE records, not upstream latest.
+          sha="${UPSTREAM:-$(cat devices/SOURCE)}"
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+          echo "Building devices from $sha."
+
       - name: Generate the devices from the MIDI Guide dataset
+        env:
+          SHA: ${{ steps.upstream.outputs.sha }}
         run: |
           npm ci
-          npm run devices
+          git clone --quiet https://github.com/pencilresearch/midi.git .midi-guide
+          git -C .midi-guide checkout --quiet "$SHA"
+          node scripts/import-devices.mjs .midi-guide
+          node scripts/validate-devices.mjs
+
       - name: Assemble the site
         # Only the files the app needs - no tooling, tests or docs.
         run: |
@@ -53,8 +80,10 @@ jobs:
           cp index.html _site/
           cp -r css js _site/
           cp -r devices/generated _site/devices/
+
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
+
       - id: deployment
         uses: actions/deploy-pages@v4

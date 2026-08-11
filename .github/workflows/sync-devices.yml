@@ -1,0 +1,137 @@
+name: sync devices
+
+# Nothing can notify us when another repo changes, so this polls for it.
+on:
+  schedule:
+    - cron: "0 */8 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: sync-devices
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.check.outputs.changed }}
+      previous: ${{ steps.check.outputs.previous }}
+      latest: ${{ steps.check.outputs.latest }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compare the dataset against what we last built
+        id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          latest=$(gh api repos/pencilresearch/midi/commits/main --jq .sha)
+
+          # devices/SOURCE is the only state kept between runs.
+          previous=$(cat devices/SOURCE)
+
+          echo "latest=$latest" >> "$GITHUB_OUTPUT"
+          echo "previous=$previous" >> "$GITHUB_OUTPUT"
+
+          if [ "$latest" = "$previous" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "Already on $latest, nothing to do."
+            exit 0
+          fi
+
+          # Upstream commits plenty this app doesn't care about.
+          files=$(gh api --paginate "repos/pencilresearch/midi/compare/$previous...$latest" \
+            --jq '.files[].filename' 2>/dev/null || echo UNKNOWN)
+
+          if [ "$files" = "UNKNOWN" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "Could not compare against $previous, rebuilding to be safe."
+            exit 0
+          fi
+
+          devices=$(echo "$files" | grep -E '^[^/]+/.+\.csv$' | grep -vc '\.triggers\.csv$' || true)
+
+          if [ "${devices:-0}" -gt 0 ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "$devices device file(s) changed between $previous and $latest."
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "Dataset moved to $latest but no device files changed."
+          fi
+
+  deploy:
+    needs: check
+    if: needs.check.outputs.changed == 'true'
+    uses: ./.github/workflows/deploy.yml
+    with:
+      upstream: ${{ needs.check.outputs.latest }}
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+
+  release:
+    # Only cut a release for something that actually went live.
+    needs: [check, deploy]
+    if: needs.check.outputs.changed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+
+      - name: Work out what changed in the dataset
+        env:
+          PREVIOUS: ${{ needs.check.outputs.previous }}
+          LATEST: ${{ needs.check.outputs.latest }}
+        run: |
+          # Full clone: diffing two commits needs the history between them.
+          git clone --quiet https://github.com/pencilresearch/midi.git .midi-guide
+
+          # Without this, git escapes non-ascii paths and they go missing.
+          git -C .midi-guide config core.quotePath false
+
+          if git -C .midi-guide cat-file -e "$PREVIOUS^{commit}" 2>/dev/null; then
+            git -C .midi-guide diff --name-status "$PREVIOUS" "$LATEST" -- '*.csv' \
+              > "$RUNNER_TEMP/changes.txt"
+          else
+            # Upstream rewrote history, so treat every device as added.
+            git -C .midi-guide ls-tree -r --name-only "$LATEST" \
+              | grep '\.csv$' | sed 's/^/A\t/' > "$RUNNER_TEMP/changes.txt"
+          fi
+
+          wc -l < "$RUNNER_TEMP/changes.txt"
+
+      - name: Update the version, changelog and release notes
+        id: release
+        run: |
+          version=$(node scripts/release.mjs "$RUNNER_TEMP/notes.md" \
+            < "$RUNNER_TEMP/changes.txt")
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Commit, tag and release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.release.outputs.version }}
+          LATEST: ${{ needs.check.outputs.latest }}
+        # The release body is the changelog entry, written by release.mjs.
+        run: |
+          # The numeric prefix is the bot's account id, and links the commit.
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          echo "$LATEST" > devices/SOURCE
+          git add package.json CHANGELOG.md devices/SOURCE
+          git commit -m "release $VERSION"
+          git tag "v$VERSION"
+          git push origin HEAD:main --tags
+
+          gh release create "v$VERSION" --title "v$VERSION" \
+            --notes-file "$RUNNER_TEMP/notes.md"
