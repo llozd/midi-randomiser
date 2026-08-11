@@ -31,11 +31,14 @@ test("changes are grouped by what happened", () => {
   });
 });
 
-test("trigger files and non-csv paths are ignored", () => {
+test("triggers, templates and non-csv paths are ignored", () => {
   const changes = readChanges(
-    ["A\tKORG/drumlogue.triggers.csv", "M\tREADME.md", "A\tRoland/S-1.csv"].join(
-      "\n",
-    ),
+    [
+      "A\tKORG/drumlogue.triggers.csv",
+      "M\tREADME.md",
+      "M\ttemplate.csv",
+      "A\tRoland/S-1.csv",
+    ].join("\n"),
   );
 
   assert.deepEqual(changes.added, ["Roland S-1"]);

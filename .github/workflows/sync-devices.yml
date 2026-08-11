@@ -1,0 +1,120 @@
+name: sync devices
+
+# GitHub only delivers events to workflows in the repo they happened in, so
+# there is no way to be told when the dataset changes. This polls instead.
+on:
+  schedule:
+    - cron: "0 */8 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: sync-devices
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.check.outputs.changed }}
+      previous: ${{ steps.check.outputs.previous }}
+      latest: ${{ steps.check.outputs.latest }}
+    steps:
+      - name: Compare the dataset against the last release
+        id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          latest=$(gh api repos/pencilresearch/midi/commits/main --jq .sha)
+
+          # The last release records what it was built from, so nothing else
+          # has to be stored between runs.
+          previous=$(gh release view --json body --jq .body 2>/dev/null \
+            | grep -oE 'pencilresearch/midi@[0-9a-f]{40}' \
+            | cut -d@ -f2 || true)
+
+          echo "latest=$latest" >> "$GITHUB_OUTPUT"
+          echo "previous=$previous" >> "$GITHUB_OUTPUT"
+
+          if [ "$latest" = "$previous" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "Already on $latest, nothing to do."
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "Dataset moved from ${previous:-nothing} to $latest."
+          fi
+
+  deploy:
+    needs: check
+    if: needs.check.outputs.changed == 'true'
+    uses: ./.github/workflows/deploy.yml
+    with:
+      upstream: ${{ needs.check.outputs.latest }}
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+
+  release:
+    # Only cut a release for something that actually went live.
+    needs: [check, deploy]
+    if: needs.check.outputs.changed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+
+      - name: Work out what changed in the dataset
+        env:
+          PREVIOUS: ${{ needs.check.outputs.previous }}
+          LATEST: ${{ needs.check.outputs.latest }}
+        run: |
+          # Full clone: diffing two commits needs the history between them.
+          git clone --quiet https://github.com/pencilresearch/midi.git .midi-guide
+
+          # Without this, git escapes non-ascii paths and four devices with
+          # accented names go missing from the notes.
+          git -C .midi-guide config core.quotePath false
+
+          if [ -n "$PREVIOUS" ] && git -C .midi-guide cat-file -e "$PREVIOUS^{commit}" 2>/dev/null; then
+            git -C .midi-guide diff --name-status "$PREVIOUS" "$LATEST" -- '*.csv' > changes.txt
+          else
+            # No previous release, or upstream rewrote history. Treat every
+            # device as added rather than failing the run.
+            git -C .midi-guide ls-tree -r --name-only "$LATEST" \
+              | grep '\.csv$' | sed 's/^/A\t/' > changes.txt
+          fi
+
+          wc -l < changes.txt
+
+      - name: Update the version, changelog and release notes
+        id: release
+        run: |
+          version=$(node scripts/release.mjs notes.md < changes.txt)
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Commit, tag and release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.release.outputs.version }}
+          LATEST: ${{ needs.check.outputs.latest }}
+        run: |
+          printf '\n---\n\nSource: pencilresearch/midi@%s\n' "$LATEST" >> notes.md
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package.json CHANGELOG.md
+          git commit -m "release $VERSION"
+          git tag "v$VERSION"
+          git push origin HEAD:main --tags
+
+          gh release create "v$VERSION" --title "$VERSION" --notes-file notes.md

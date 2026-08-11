@@ -31,7 +31,13 @@ export function readChanges(diff) {
     const [status, ...paths] = line.split("\t");
     const path = paths.at(-1);
 
-    if (!path || !path.endsWith(".csv") || path.endsWith(".triggers.csv")) {
+    // Devices live in a manufacturer directory. Root files are templates.
+    if (
+      !path ||
+      !path.endsWith(".csv") ||
+      path.endsWith(".triggers.csv") ||
+      !path.includes("/")
+    ) {
       continue;
     }
 
