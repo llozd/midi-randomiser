@@ -32,6 +32,13 @@ export function renderParameters(parameters) {
   parameterList.replaceChildren(...parameters.map(createRow));
 }
 
+/** Ticks every checkbox without rebuilding the list. */
+export function setAllEnabled(enabled) {
+  for (const box of parameterList.querySelectorAll(".parameter-enabled")) {
+    box.checked = enabled;
+  }
+}
+
 const rowIndex = (element) =>
   [...parameterList.children].indexOf(element.closest(".parameter"));
 
