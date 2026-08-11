@@ -1,4 +1,15 @@
-// Converts the MIDI Guide dataset (CC BY-SA 4.0) into the app's device JSON.
+/**
+ * Converts the MIDI Guide CSV dataset into the device JSON the app loads.
+ *
+ * Source: https://github.com/pencilresearch/midi, used under CC BY-SA 4.0.
+ * One CSV per device becomes one JSON file in devices/generated/, plus the
+ * index the app discovers them through. Nothing here is committed - it is
+ * rebuilt on every deploy, and locally with `npm run devices`.
+ *
+ * devices/NOTICE records the attribution and every way the format is changed.
+ *
+ * Pass a path to an existing clone to convert that instead of fetching one.
+ */
 
 import { execFile } from "node:child_process";
 import { mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
