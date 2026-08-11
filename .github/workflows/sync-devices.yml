@@ -104,20 +104,22 @@ jobs:
           git -C .midi-guide config core.quotePath false
 
           if git -C .midi-guide cat-file -e "$PREVIOUS^{commit}" 2>/dev/null; then
-            git -C .midi-guide diff --name-status "$PREVIOUS" "$LATEST" -- '*.csv' > changes.txt
+            git -C .midi-guide diff --name-status "$PREVIOUS" "$LATEST" -- '*.csv' \
+              > "$RUNNER_TEMP/changes.txt"
           else
             # Upstream rewrote history. Treat every device as added rather
             # than failing the run.
             git -C .midi-guide ls-tree -r --name-only "$LATEST" \
-              | grep '\.csv$' | sed 's/^/A\t/' > changes.txt
+              | grep '\.csv$' | sed 's/^/A\t/' > "$RUNNER_TEMP/changes.txt"
           fi
 
-          wc -l < changes.txt
+          wc -l < "$RUNNER_TEMP/changes.txt"
 
       - name: Update the version, changelog and release notes
         id: release
         run: |
-          version=$(node scripts/release.mjs notes.md < changes.txt)
+          version=$(node scripts/release.mjs "$RUNNER_TEMP/notes.md" \
+            < "$RUNNER_TEMP/changes.txt")
           echo "version=$version" >> "$GITHUB_OUTPUT"
 
       - name: Commit, tag and release
@@ -136,4 +138,5 @@ jobs:
           git tag "v$VERSION"
           git push origin HEAD:main --tags
 
-          gh release create "v$VERSION" --title "v$VERSION" --notes-file notes.md
+          gh release create "v$VERSION" --title "v$VERSION" \
+            --notes-file "$RUNNER_TEMP/notes.md"
