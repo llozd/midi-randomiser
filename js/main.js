@@ -5,6 +5,7 @@ import {
   onPortsChanged,
   requestAccess,
   sendCC,
+  sendCC14,
   sendNRPN,
   setChannel,
   setOutput,
@@ -210,6 +211,8 @@ function randomise() {
     for (const { parameter, value } of picks) {
       if (parameter.type === "nrpn") {
         sendNRPN(parameter.number, value);
+      } else if (parameter.type === "cc14") {
+        sendCC14(parameter.number, parameter.lsbNumber, value);
       } else {
         sendCC(parameter.number, value);
       }

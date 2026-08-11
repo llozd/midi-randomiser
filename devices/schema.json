@@ -21,8 +21,9 @@
       "additionalProperties": false,
       "properties": {
         "name": { "type": "string", "minLength": 1 },
-        "type": { "enum": ["cc", "nrpn"] },
+        "type": { "enum": ["cc", "cc14", "nrpn"] },
         "number": { "type": "integer", "minimum": 0 },
+        "lsbNumber": { "type": "integer", "minimum": 0, "maximum": 127 },
         "min": { "type": "integer", "minimum": 0 },
         "max": { "type": "integer", "minimum": 0 },
         "enabled": { "type": "boolean" }
@@ -34,6 +35,7 @@
             "required": ["type"]
           },
           "then": {
+            "not": { "required": ["lsbNumber"] },
             "properties": {
               "number": { "type": "integer", "maximum": 127 },
               "min": { "type": "integer", "maximum": 127 },
@@ -43,10 +45,25 @@
         },
         {
           "if": {
+            "properties": { "type": { "const": "cc14" } },
+            "required": ["type"]
+          },
+          "then": {
+            "required": ["lsbNumber"],
+            "properties": {
+              "number": { "type": "integer", "maximum": 127 },
+              "min": { "type": "integer", "maximum": 16383 },
+              "max": { "type": "integer", "maximum": 16383 }
+            }
+          }
+        },
+        {
+          "if": {
             "properties": { "type": { "const": "nrpn" } },
             "required": ["type"]
           },
           "then": {
+            "not": { "required": ["lsbNumber"] },
             "properties": {
               "number": { "type": "integer", "maximum": 16383 },
               "min": { "type": "integer", "maximum": 16383 },

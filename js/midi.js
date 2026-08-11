@@ -1,6 +1,6 @@
 /** Web MIDI access, output-port enumeration, and sending CC and NRPN. */
 
-import { ccMessage, nrpnMessages } from "./messages.js";
+import { cc14Messages, ccMessage, nrpnMessages } from "./messages.js";
 
 let access = null;
 let outputId = null;
@@ -49,6 +49,10 @@ function send(messages) {
 
 export function sendCC(number, value) {
   send([ccMessage(channel, number, value)]);
+}
+
+export function sendCC14(number, lsbNumber, value) {
+  send(cc14Messages(channel, number, lsbNumber, value));
 }
 
 export function sendNRPN(number, value) {
