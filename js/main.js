@@ -11,6 +11,7 @@ import {
   setOutput,
 } from "./midi.js";
 import { randomiseParameters } from "./randomiser.js";
+import { getOverrides, parameterKey, setOverrides } from "./storage.js";
 import {
   onParameterEdit,
   renderParameters,
@@ -33,6 +34,9 @@ let connected = false;
 // Manifest entries; the device itself is fetched on selection.
 let index = [];
 let currentDevice = null;
+let currentFile = null;
+// What the device file shipped, so only real changes are stored.
+let shipped = new Map();
 // Bumped on every selection, so a slow fetch can't overwrite a newer one.
 let selectionToken = 0;
 
@@ -161,6 +165,55 @@ function selectManufacturer(manufacturer) {
   return selectDevice(first.file);
 }
 
+/** Overlays saved changes and remembers what the file shipped with. */
+function applyOverrides(device, overrides) {
+  shipped = new Map();
+
+  for (const parameter of device.parameters) {
+    const key = parameterKey(parameter);
+    const { enabled, min, max } = parameter;
+    shipped.set(key, { enabled, min, max });
+
+    const saved = overrides[key];
+
+    if (!saved) {
+      continue;
+    }
+
+    if (typeof saved.enabled === "boolean") {
+      parameter.enabled = saved.enabled;
+    }
+
+    if (Number.isInteger(saved.min)) {
+      parameter.min = saved.min;
+    }
+
+    if (Number.isInteger(saved.max)) {
+      parameter.max = saved.max;
+    }
+  }
+}
+
+function persistOverrides() {
+  if (!currentDevice) {
+    return;
+  }
+
+  const overrides = {};
+
+  for (const parameter of currentDevice.parameters) {
+    const key = parameterKey(parameter);
+    const base = shipped.get(key);
+    const { enabled, min, max } = parameter;
+
+    if (base.enabled !== enabled || base.min !== min || base.max !== max) {
+      overrides[key] = { enabled, min, max };
+    }
+  }
+
+  setOverrides(currentFile, overrides);
+}
+
 /** The button both reports and flips the state, so its label follows it. */
 function updateToggleAll() {
   const parameters = currentDevice?.parameters ?? [];
@@ -183,6 +236,7 @@ function toggleAll() {
 
   setAllEnabled(enabled);
   updateToggleAll();
+  persistOverrides();
 }
 
 async function selectDevice(file) {
@@ -197,6 +251,7 @@ async function selectDevice(file) {
 
   const token = ++selectionToken;
   currentDevice = null;
+  currentFile = null;
   renderParameters([]);
   updateToggleAll();
   setDeviceStatus(`Loading ${deviceLabel(entry)}...`);
@@ -220,7 +275,9 @@ async function selectDevice(file) {
     return;
   }
 
+  applyOverrides(device, getOverrides(file));
   currentDevice = device;
+  currentFile = file;
   setDeviceStatus("");
   renderParameters(device.parameters);
   updateToggleAll();
@@ -309,6 +366,8 @@ onParameterEdit((index, field, value) => {
   if (field === "enabled") {
     updateToggleAll();
   }
+
+  persistOverrides();
 });
 
 connect();
