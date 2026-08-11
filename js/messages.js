@@ -23,11 +23,7 @@ export function ccMessage(channel, number, value) {
   ];
 }
 
-/**
- * Selects the parameter on CC 99/98, sends the 14-bit value on CC 6/38, then
- * nulls the parameter number on CC 101/100 so a later data-entry message can't
- * land on it by accident.
- */
+/** Select on 99/98, value on 6/38, then null 101/100 so nothing strays. */
 export function nrpnMessages(channel, number, value) {
   const target = clamp(value, NRPN_MAX);
 

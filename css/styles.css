@@ -113,8 +113,7 @@
     gap: 1rem;
   }
 
-  /* Sections are flex rows: a full-width child forces whatever follows onto a
-     new line, which keeps the markup free of layout-only wrappers. */
+  /* Flex rows: a full-width child pushes what follows onto a new line. */
   main > section {
     display: flex;
     flex-wrap: wrap;
@@ -266,8 +265,7 @@
       width: 100%;
     }
 
-    /* Read-only cells. They describe the parameter rather than control it, so
-       they sit flat against the row instead of looking like inputs. */
+    /* Read-only cells, so they sit flat rather than looking like inputs. */
     .parameter-name {
       overflow: hidden;
       text-overflow: ellipsis;

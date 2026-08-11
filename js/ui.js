@@ -6,8 +6,7 @@ const parameterTemplate = document.querySelector("#parameter-row");
 function createRow(parameter) {
   const row = parameterTemplate.content.firstElementChild.cloneNode(true);
 
-  // Only the range and the checkbox are inputs. The rest describe the
-  // parameter and are read straight from the device file.
+  // Only the range and checkbox are inputs; the rest are read-only cells.
   for (const cell of row.querySelectorAll("[data-field]")) {
     const value = parameter[cell.dataset.field];
 

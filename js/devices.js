@@ -1,8 +1,4 @@
-/**
- * Static hosts can't list a directory, so devices are discovered through the
- * devices/generated/index.json manifest. It carries enough to build the picker, and a
- * device file is only fetched once that device is selected.
- */
+// Static hosts can't list a directory, so a manifest lists what's available.
 
 const DEVICES_PATH = "devices/generated/";
 
