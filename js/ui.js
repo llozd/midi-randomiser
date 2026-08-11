@@ -3,6 +3,10 @@
 const parameterList = document.querySelector("#parameter-rows");
 const parameterTemplate = document.querySelector("#parameter-row");
 
+/** A 14-bit CC spans two numbers, so it shows both. */
+const numberLabel = ({ type, number, lsbNumber }) =>
+  type === "cc14" ? `${number} + ${lsbNumber}` : String(number);
+
 function createRow(parameter) {
   const row = parameterTemplate.content.firstElementChild.cloneNode(true);
 
@@ -14,6 +18,8 @@ function createRow(parameter) {
       cell.checked = value;
     } else if (cell.tagName === "INPUT") {
       cell.value = value;
+    } else if (cell.dataset.field === "number") {
+      cell.textContent = numberLabel(parameter);
     } else {
       cell.textContent = value;
     }
