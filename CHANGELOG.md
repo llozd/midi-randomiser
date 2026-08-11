@@ -8,6 +8,26 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-08-11
+
+### Added
+
+- Initial sync with the MIDI Guide dataset, which now supplies every device.
+- A manufacturer and model picker, and a button to enable or disable every
+  parameter at once.
+- 14-bit CC parameters, sent as a coarse and a fine control change.
+
+### Changed
+
+- Parameter changes are remembered per device rather than saved as whole
+  devices.
+- A parameter's name, type and number are shown as text, not form controls.
+
+### Removed
+
+- Creating, saving, importing, exporting and deleting devices. Missing or wrong
+  devices are fixed in the dataset instead.
+
 ## [0.1.0] - 2026-08-03
 
 ### Added
@@ -23,5 +43,6 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   import and export them as JSON, and delete saved devices.
 - A dark interface sized for desktop browsers.
 
-[Unreleased]: https://github.com/llozd/midi-randomiser/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/llozd/midi-randomiser/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/llozd/midi-randomiser/compare/v0.1.0...v1.0.0
 [0.1.0]: https://github.com/llozd/midi-randomiser/releases/tag/v0.1.0

@@ -1,6 +1,6 @@
 {
   "name": "midi-randomiser",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "A small web application for sending random CC and NRPN values to MIDI devices",
   "type": "module",
   "private": true,
