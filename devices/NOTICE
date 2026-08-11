@@ -21,8 +21,8 @@ application reads. The data is not edited, but the format is:
 
   - Each device's rows become one JSON file, described by devices/schema.json.
   - The nrpn_msb and nrpn_lsb columns are folded into a single 14-bit number.
-  - Rows carrying a cc_lsb are omitted. They pair two CC numbers into a single
-    14-bit value, which devices/schema.json cannot yet express.
+  - Rows carrying a cc_lsb become a "cc14" parameter holding both CC numbers.
+    The documented range is carried through as-is and not reinterpreted.
   - A row documenting both a CC and an NRPN is imported as the CC.
   - Rows documenting neither a CC nor an NRPN are omitted, as are rows whose
     values fall outside what devices/schema.json can express.

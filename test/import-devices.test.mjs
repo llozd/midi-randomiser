@@ -90,40 +90,55 @@ test("a blank cc range defaults to the full 0-127", () => {
   assert.equal(parameter.max, 127);
 });
 
-test("a 14-bit cc pair is skipped, whatever range it documents", () => {
+test("a cc_lsb row becomes a 14-bit cc keeping both numbers", () => {
+  assert.deepEqual(
+    toParameter({
+      parameter_name: "Master volume",
+      cc_msb: "7",
+      cc_lsb: "39",
+      cc_min_value: "0",
+      cc_max_value: "255",
+    }),
+    {
+      name: "Master volume",
+      type: "cc14",
+      number: 7,
+      lsbNumber: 39,
+      min: 0,
+      max: 255,
+      enabled: true,
+    },
+  );
+});
+
+test("a 14-bit range is carried through rather than reinterpreted", () => {
   for (const cc_max_value of ["16383", "255", "127", "3"]) {
-    assert.equal(
-      toParameter({
-        parameter_name: "Wide",
-        cc_msb: "1",
-        cc_lsb: "33",
-        cc_min_value: "0",
-        cc_max_value,
-      }),
-      false,
-    );
+    const parameter = toParameter({
+      parameter_name: "Wide",
+      cc_msb: "1",
+      cc_lsb: "33",
+      cc_max_value,
+    });
+
+    assert.equal(parameter.type, "cc14");
+    assert.equal(parameter.max, Number(cc_max_value));
   }
 });
 
-test("skipped 14-bit parameters are counted", () => {
-  const { device, wide } = toDevice(
-    csv(
-      { parameter_name: "Plain", cc_msb: "74" },
-      { parameter_name: "Wide", cc_msb: "1", cc_lsb: "33" },
-    ),
-  );
+test("a blank 14-bit range defaults to the full 0-16383", () => {
+  const parameter = toParameter({ cc_msb: "1", cc_lsb: "33" });
 
-  assert.equal(device.parameters.length, 1);
-  assert.equal(wide, 1);
+  assert.equal(parameter.min, 0);
+  assert.equal(parameter.max, 16383);
 });
 
-test("a device that is entirely 14-bit is skipped", () => {
-  const { device, wide } = toDevice(
+test("a device that is entirely 14-bit still imports", () => {
+  const { device } = toDevice(
     csv({ parameter_name: "Wide", cc_msb: "1", cc_lsb: "33" }),
   );
 
-  assert.equal(device, null);
-  assert.equal(wide, 1);
+  assert.equal(device.parameters.length, 1);
+  assert.equal(device.parameters[0].type, "cc14");
 });
 
 test("an nrpn row folds msb and lsb into one 14-bit number", () => {
@@ -168,6 +183,15 @@ test("parameters outside the schema's range are not usable", () => {
     isUsable({ type: "nrpn", number: 1024, min: 0, max: 16383 }),
     true,
   );
+});
+
+test("a 14-bit cc needs both numbers inside the cc range", () => {
+  const wide = { type: "cc14", number: 7, lsbNumber: 39, min: 0, max: 16383 };
+
+  assert.equal(isUsable(wide), true);
+  assert.equal(isUsable({ ...wide, lsbNumber: 200 }), false);
+  assert.equal(isUsable({ ...wide, number: 200 }), false);
+  assert.equal(isUsable({ ...wide, max: 99999 }), false);
 });
 
 test("filenames are kebab-cased", () => {
@@ -231,5 +255,5 @@ test("a device with no usable parameters is skipped", () => {
 });
 
 test("an empty csv is skipped", () => {
-  assert.deepEqual(toDevice(""), { device: null, dropped: 0, wide: 0 });
+  assert.deepEqual(toDevice(""), { device: null, dropped: 0 });
 });

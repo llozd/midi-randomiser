@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { ccMessage, nrpnMessages } from "../js/messages.js";
+import { cc14Messages, ccMessage, nrpnMessages } from "../js/messages.js";
 
 test("cc message uses the channel nibble", () => {
   assert.deepEqual(ccMessage(1, 74, 64), [0xb0, 74, 64]);
@@ -12,6 +12,30 @@ test("cc message uses the channel nibble", () => {
 test("cc value is clamped to 0-127", () => {
   assert.equal(ccMessage(1, 74, 200)[2], 127);
   assert.equal(ccMessage(1, 74, -5)[2], 0);
+});
+
+test("cc14 splits the value across its two cc numbers", () => {
+  const [coarse, fine] = cc14Messages(1, 7, 39, 12063);
+
+  assert.deepEqual(coarse, [0xb0, 7, 94]);
+  assert.deepEqual(fine, [0xb0, 39, 31]);
+  // The two 7-bit halves must reconstruct the original value.
+  assert.equal((coarse[2] << 7) | fine[2], 12063);
+});
+
+test("cc14 sends exactly two messages, both on the channel", () => {
+  const messages = cc14Messages(3, 1, 33, 500);
+
+  assert.equal(messages.length, 2);
+  for (const message of messages) {
+    assert.equal(message[0], 0xb2);
+  }
+});
+
+test("cc14 value is clamped to 14 bits", () => {
+  const [coarse, fine] = cc14Messages(1, 7, 39, 99999);
+
+  assert.equal((coarse[2] << 7) | fine[2], 16383);
 });
 
 test("nrpn splits the parameter number across cc 99 and 98", () => {

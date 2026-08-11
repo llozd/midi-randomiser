@@ -23,6 +23,16 @@ export function ccMessage(channel, number, value) {
   ];
 }
 
+/** Coarse half on the parameter's CC, fine half on its paired CC. */
+export function cc14Messages(channel, number, lsbNumber, value) {
+  const target = clamp(value, NRPN_MAX);
+
+  return [
+    ccMessage(channel, number, (target >> 7) & 0x7f),
+    ccMessage(channel, lsbNumber, target & 0x7f),
+  ];
+}
+
 /** Select on 99/98, value on 6/38, then null 101/100 so nothing strays. */
 export function nrpnMessages(channel, number, value) {
   const target = clamp(value, NRPN_MAX);
