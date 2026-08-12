@@ -1,6 +1,6 @@
 /**
- * Remembers the changes you make to a device's parameters, so enabling a few
- * and narrowing their ranges survives a reload.
+ * What the browser remembers between visits: the changes you make to a
+ * device's parameters, and your choice of theme.
  *
  * Only parameters that differ from the device file are stored, keyed by what
  * identifies them rather than by position, so an upstream change that adds or
@@ -8,6 +8,7 @@
  */
 
 const KEY = "midi-randomiser.overrides";
+const THEME_KEY = "midi-randomiser.theme";
 
 /**
  * Type, number and name together. Number alone collides on devices that reuse
@@ -41,6 +42,24 @@ export function setOverrides(file, overrides) {
 
   try {
     localStorage.setItem(KEY, JSON.stringify(all));
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+/** Null when never chosen, so the system preference wins. */
+export function getTheme() {
+  try {
+    const stored = localStorage.getItem(THEME_KEY);
+    return stored === "light" || stored === "dark" ? stored : null;
+  } catch {
+    return null;
+  }
+}
+
+export function setTheme(theme) {
+  try {
+    localStorage.setItem(THEME_KEY, theme);
   } catch (error) {
     console.error(error);
   }

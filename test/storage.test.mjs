@@ -10,9 +10,8 @@ globalThis.localStorage = {
   },
 };
 
-const { getOverrides, parameterKey, setOverrides } = await import(
-  "../js/storage.js"
-);
+const { getOverrides, getTheme, parameterKey, setOverrides, setTheme } =
+  await import("../js/storage.js");
 
 const KEY = "midi-randomiser.overrides";
 const narrowed = { enabled: false, min: 20, max: 90 };
@@ -82,4 +81,21 @@ test("writing over corrupt storage recovers", () => {
   setOverrides("a.json", { "cc:1:A": narrowed });
 
   assert.deepEqual(getOverrides("a.json"), { "cc:1:A": narrowed });
+});
+
+test("no stored theme leaves the system preference in charge", () => {
+  assert.equal(getTheme(), null);
+});
+
+test("a chosen theme round-trips", () => {
+  setTheme("light");
+  assert.equal(getTheme(), "light");
+
+  setTheme("dark");
+  assert.equal(getTheme(), "dark");
+});
+
+test("a nonsense stored theme is ignored", () => {
+  store["midi-randomiser.theme"] = "chartreuse";
+  assert.equal(getTheme(), null);
 });

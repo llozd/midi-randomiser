@@ -11,7 +11,13 @@ import {
   setOutput,
 } from "./midi.js";
 import { randomiseParameters } from "./randomiser.js";
-import { getOverrides, parameterKey, setOverrides } from "./storage.js";
+import {
+  getOverrides,
+  getTheme,
+  parameterKey,
+  setOverrides,
+  setTheme,
+} from "./storage.js";
 import {
   onParameterEdit,
   renderParameters,
@@ -26,6 +32,7 @@ const manufacturerSelect = document.querySelector("#manufacturer-select");
 const deviceSelect = document.querySelector("#device-select");
 const randomiseButton = document.querySelector("#randomise");
 const toggleAllButton = document.querySelector("#toggle-all");
+const themeSwitch = document.querySelector("#theme-switch");
 const deviceStatus = document.querySelector("#device-status");
 
 const NUMERIC_FIELDS = new Set(["min", "max"]);
@@ -39,6 +46,15 @@ let currentFile = null;
 let shipped = new Map();
 // Bumped on every selection, so a slow fetch can't overwrite a newer one.
 let selectionToken = 0;
+
+const systemTheme = () =>
+  matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+
+/** The label is the theme you get by pressing it, not the current one. */
+function applyTheme(theme) {
+  document.documentElement.dataset.theme = theme;
+  themeSwitch.textContent = theme === "dark" ? "Light" : "Dark";
+}
 
 function setStatus(message) {
   statusLine.textContent = message;
@@ -370,5 +386,14 @@ onParameterEdit((index, field, value) => {
   persistOverrides();
 });
 
+themeSwitch.addEventListener("click", () => {
+  const next =
+    document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+
+  applyTheme(next);
+  setTheme(next);
+});
+
+applyTheme(getTheme() ?? systemTheme());
 connect();
 loadDevices();
