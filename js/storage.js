@@ -8,6 +8,7 @@
  */
 
 const KEY = "midi-randomiser.overrides";
+// Mirrored by the inline script in index.html, which beats the flash.
 const THEME_KEY = "midi-randomiser.theme";
 
 /**
