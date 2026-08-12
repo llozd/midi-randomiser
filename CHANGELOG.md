@@ -8,6 +8,16 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-08-12
+
+### Added
+
+- Light and dark mode setting.
+
+### Changed
+
+- Enable/disable all button positioning.
+
 ## [1.0.0] - 2026-08-11
 
 ### Added
@@ -43,6 +53,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   import and export them as JSON, and delete saved devices.
 - A dark interface sized for desktop browsers.
 
-[Unreleased]: https://github.com/llozd/midi-randomiser/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/llozd/midi-randomiser/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/llozd/midi-randomiser/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/llozd/midi-randomiser/compare/v0.1.0...v1.0.0
 [0.1.0]: https://github.com/llozd/midi-randomiser/releases/tag/v0.1.0

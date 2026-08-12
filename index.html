@@ -9,10 +9,23 @@
       content="Send random CC and NRPN values to MIDI devices."
     />
     <link rel="stylesheet" href="css/styles.css" />
+    <script>
+      // Runs before paint, so a stored theme can't flash the other one.
+      try {
+        const theme = localStorage.getItem("midi-randomiser.theme");
+
+        if (theme === "light" || theme === "dark") {
+          document.documentElement.dataset.theme = theme;
+        }
+      } catch {
+        // No storage available, so the system preference stands.
+      }
+    </script>
   </head>
   <body>
     <header>
       <h1>MIDI Randomiser</h1>
+      <button id="theme-switch" type="button">Light</button>
       <p>Send random CC and NRPN values to your MIDI devices.</p>
     </header>
 
