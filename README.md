@@ -12,7 +12,7 @@ Several hundred instruments are covered, using the
 Pencil Research. The device list rebuilds itself from that dataset, so it stays
 current without anyone maintaining it here.
 
-![MIDI Randomiser with a device loaded, showing its parameters and their ranges](docs/screenshot.png)
+![MIDI Randomiser with a device loaded, showing its parameters and their ranges](docs/screenshot_dark.png)
 
 ## Requirements
 
