@@ -291,8 +291,10 @@
     }
   }
 
+  /* Sits over the enabled column, so what it toggles is obvious. */
   #toggle-all {
     margin-bottom: 0.5rem;
+    margin-left: auto;
     font-size: 0.8rem;
   }
 
