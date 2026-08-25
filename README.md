@@ -4,12 +4,12 @@ A small web application for sending random CC and NRPN values to MIDI devices.
 
 Live at <https://llozd.github.io/midi-randomiser/>
 
-Pick your synth, choose which parameters to include, and hit **Randomise** to
+Pick your synth, choose which parameters to include, and hit `Randomise` to
 send a fresh random value to every enabled one.
 
-Several hundred instruments are covered, using the
+Uses the
 [MIDI Guide dataset](https://github.com/pencilresearch/midi) maintained by
-Pencil Research. The device list rebuilds itself from that dataset, so it stays
+Pencil Research, so supports hundreds of devices. The device list rebuilds itself from that dataset, so it stays
 current without anyone maintaining it here.
 
 ![MIDI Randomiser with a device loaded, showing its parameters and their ranges](docs/screenshot_dark.png)
