@@ -80,6 +80,10 @@ jobs:
     needs: [check, deploy]
     if: needs.check.outputs.changed == 'true'
     runs-on: ubuntu-latest
+    # The release commit can't pass the pre-commit lint, which needs the
+    # generated devices this job has no reason to build.
+    env:
+      HUSKY: 0
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
