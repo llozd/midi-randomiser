@@ -8,6 +8,12 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-09-02
+
+### Added
+
+- Kinotone Ghosts
+
 ## [1.3.0] - 2026-08-28
 
 ### Added
@@ -71,7 +77,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   import and export them as JSON, and delete saved devices.
 - A dark interface sized for desktop browsers.
 
-[Unreleased]: https://github.com/llozd/midi-randomiser/compare/v1.3.0...HEAD
+[Unreleased]: https://github.com/llozd/midi-randomiser/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/llozd/midi-randomiser/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/llozd/midi-randomiser/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/llozd/midi-randomiser/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/llozd/midi-randomiser/compare/v1.0.0...v1.1.0
