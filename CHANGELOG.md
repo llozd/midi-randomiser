@@ -8,6 +8,17 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.9.0] - 2026-09-16
+
+### Added
+
+- Line 6 HX Effects
+- Line 6 HX Stomp
+- Line 6 HX Stomp XL
+- Line 6 Helix LT
+- Line 6 Helix Rack
+- Line 6 POD Go
+
 ## [1.8.0] - 2026-09-16
 
 ### Added
@@ -107,7 +118,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   import and export them as JSON, and delete saved devices.
 - A dark interface sized for desktop browsers.
 
-[Unreleased]: https://github.com/llozd/midi-randomiser/compare/v1.8.0...HEAD
+[Unreleased]: https://github.com/llozd/midi-randomiser/compare/v1.9.0...HEAD
+[1.9.0]: https://github.com/llozd/midi-randomiser/compare/v1.8.0...v1.9.0
 [1.8.0]: https://github.com/llozd/midi-randomiser/compare/v1.7.0...v1.8.0
 [1.7.0]: https://github.com/llozd/midi-randomiser/compare/v1.6.0...v1.7.0
 [1.6.0]: https://github.com/llozd/midi-randomiser/compare/v1.5.0...v1.6.0
