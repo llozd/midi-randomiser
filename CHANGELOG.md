@@ -8,6 +8,16 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.7.0] - 2026-09-16
+
+### Added
+
+- Jomox Alpha Base
+
+### Changed
+
+- Behringer Pro VS Mini
+
 ## [1.6.0] - 2026-09-07
 
 ### Added
@@ -90,7 +100,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   import and export them as JSON, and delete saved devices.
 - A dark interface sized for desktop browsers.
 
-[Unreleased]: https://github.com/llozd/midi-randomiser/compare/v1.6.0...HEAD
+[Unreleased]: https://github.com/llozd/midi-randomiser/compare/v1.7.0...HEAD
+[1.7.0]: https://github.com/llozd/midi-randomiser/compare/v1.6.0...v1.7.0
 [1.6.0]: https://github.com/llozd/midi-randomiser/compare/v1.5.0...v1.6.0
 [1.5.0]: https://github.com/llozd/midi-randomiser/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/llozd/midi-randomiser/compare/v1.3.0...v1.4.0
