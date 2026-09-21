@@ -8,6 +8,26 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.10.0] - 2026-09-21
+
+### Added
+
+- Fractal Audio Systems Axe-Fx III
+- Fractal Audio Systems FM3
+- Fractal Audio Systems FM9
+- Kemper PROFILER Player
+- Kemper PROFILER PowerHead
+- Kemper PROFILER PowerRack
+- Kemper PROFILER Stage
+- Universal Audio ANTI 1992
+- Universal Audio Dream '65
+- Universal Audio Ruby '63
+- and 1 other
+
+### Changed
+
+- 1010music bento
+
 ## [1.9.0] - 2026-09-16
 
 ### Added
@@ -118,7 +138,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   import and export them as JSON, and delete saved devices.
 - A dark interface sized for desktop browsers.
 
-[Unreleased]: https://github.com/llozd/midi-randomiser/compare/v1.9.0...HEAD
+[Unreleased]: https://github.com/llozd/midi-randomiser/compare/v1.10.0...HEAD
+[1.10.0]: https://github.com/llozd/midi-randomiser/compare/v1.9.0...v1.10.0
 [1.9.0]: https://github.com/llozd/midi-randomiser/compare/v1.8.0...v1.9.0
 [1.8.0]: https://github.com/llozd/midi-randomiser/compare/v1.7.0...v1.8.0
 [1.7.0]: https://github.com/llozd/midi-randomiser/compare/v1.6.0...v1.7.0
