@@ -8,6 +8,16 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.12.0] - 2026-09-23
+
+### Added
+
+- Neural DSP Nano Cortex
+
+### Changed
+
+- Neural DSP Quad Cortex
+
 ## [1.11.0] - 2026-09-22
 
 ### Added
@@ -149,7 +159,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   import and export them as JSON, and delete saved devices.
 - A dark interface sized for desktop browsers.
 
-[Unreleased]: https://github.com/llozd/midi-randomiser/compare/v1.11.0...HEAD
+[Unreleased]: https://github.com/llozd/midi-randomiser/compare/v1.12.0...HEAD
+[1.12.0]: https://github.com/llozd/midi-randomiser/compare/v1.11.0...v1.12.0
 [1.11.0]: https://github.com/llozd/midi-randomiser/compare/v1.10.0...v1.11.0
 [1.10.0]: https://github.com/llozd/midi-randomiser/compare/v1.9.0...v1.10.0
 [1.9.0]: https://github.com/llozd/midi-randomiser/compare/v1.8.0...v1.9.0
