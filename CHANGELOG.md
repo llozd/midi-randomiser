@@ -8,6 +8,15 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.15.0] - 2026-10-01
+
+### Added
+
+- HeadRush Gigboard
+- HeadRush MX5
+- HeadRush Pedalboard
+- HeadRush Prime
+
 ## [1.14.0] - 2026-09-29
 
 ### Added
@@ -175,7 +184,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   import and export them as JSON, and delete saved devices.
 - A dark interface sized for desktop browsers.
 
-[Unreleased]: https://github.com/llozd/midi-randomiser/compare/v1.14.0...HEAD
+[Unreleased]: https://github.com/llozd/midi-randomiser/compare/v1.15.0...HEAD
+[1.15.0]: https://github.com/llozd/midi-randomiser/compare/v1.14.0...v1.15.0
 [1.14.0]: https://github.com/llozd/midi-randomiser/compare/v1.13.0...v1.14.0
 [1.13.0]: https://github.com/llozd/midi-randomiser/compare/v1.12.0...v1.13.0
 [1.12.0]: https://github.com/llozd/midi-randomiser/compare/v1.11.0...v1.12.0
