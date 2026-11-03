@@ -8,6 +8,19 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.17.1] - 2026-11-03
+
+### Changed
+
+- Elektron Analog Four MKII
+- Elektron Analog Heat +FX
+- Elektron Analog Rytm MKII
+- Elektron Digitakt II
+- Elektron Digitone II
+- Elektron Syntakt
+- KORG phase8
+- Zoom LiveTrak L6
+
 ## [1.17.0] - 2026-10-27
 
 ### Added
@@ -202,7 +215,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   import and export them as JSON, and delete saved devices.
 - A dark interface sized for desktop browsers.
 
-[Unreleased]: https://github.com/llozd/midi-randomiser/compare/v1.17.0...HEAD
+[Unreleased]: https://github.com/llozd/midi-randomiser/compare/v1.17.1...HEAD
+[1.17.1]: https://github.com/llozd/midi-randomiser/compare/v1.17.0...v1.17.1
 [1.17.0]: https://github.com/llozd/midi-randomiser/compare/v1.16.1...v1.17.0
 [1.16.1]: https://github.com/llozd/midi-randomiser/compare/v1.16.0...v1.16.1
 [1.16.0]: https://github.com/llozd/midi-randomiser/compare/v1.15.0...v1.16.0
