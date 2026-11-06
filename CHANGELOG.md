@@ -8,6 +8,20 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.18.0] - 2026-11-06
+
+### Added
+
+- KORG M3
+- KORG TRITON
+- Roland MC-808
+- Roland MC-909
+- Yamaha RM1x
+- Zoom MS-50G
+- Zoom MS-60B
+- Zoom MS-70CDR
+- Zoom MultiStomp MIDISTOMP
+
 ## [1.17.1] - 2026-11-03
 
 ### Changed
@@ -215,7 +229,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   import and export them as JSON, and delete saved devices.
 - A dark interface sized for desktop browsers.
 
-[Unreleased]: https://github.com/llozd/midi-randomiser/compare/v1.17.1...HEAD
+[Unreleased]: https://github.com/llozd/midi-randomiser/compare/v1.18.0...HEAD
+[1.18.0]: https://github.com/llozd/midi-randomiser/compare/v1.17.1...v1.18.0
 [1.17.1]: https://github.com/llozd/midi-randomiser/compare/v1.17.0...v1.17.1
 [1.17.0]: https://github.com/llozd/midi-randomiser/compare/v1.16.1...v1.17.0
 [1.16.1]: https://github.com/llozd/midi-randomiser/compare/v1.16.0...v1.16.1
